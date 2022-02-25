@@ -1,89 +1,126 @@
+##creating table for roles
 create table roles(
       roleId SERIAL PRIMARY KEY,
       rolename varchar(255)
       
     )
+    
+##creating table for users
 	create table users(
       userId SERIAL PRIMARY KEY,
       username varchar(255),
-      roleId int REFERENCES roles(roleId)	
-      
+      roleId int REFERENCES roles(roleId)	  
     )
 	
+##creating table for products
 	create table product(
 		productId SERIAL PRIMARY KEY,
 		productname varchar(255),
 		categoryId int REFERENCES category(categoryId)
 	)
+	
+##creating table for permissions
 	create table permissions(
 		permisssionId SERIAL PRIMARY KEY,
 		permissionname varchar(255),
 		Grantedtorole int REFERENCES roles(roleId )
 	)
+	
+##creating table for category	
 	create table category(
 		categoryId SERIAL PRIMARY KEY,
 		categoryname varchar(255)
 	)
-	
+
+##creating table for orders	
 	create table orders(
 		orderId SERIAL PRIMARY KEY,
 		orderName int REFERENCES product(productId),
 		orderedBy int REFERENCES users(userId)
 	)
-		
-    alter table orders add column orderDate date
+
+##altering the table orders to add orderdate		
+    	alter table orders add column orderDate date
 	
+##inserting values to roles	
 	insert into roles (rolename) values('Customer'), ('Administrator'), ('Seller')
 	
 	select * from roles
 
+##altering the table users to add address
+	alter table users add column address varchar(255);
 
-alter table users add column address varchar(255);
+##altering the table product to add price of product
+	alter table product add column price int;
 
-alter table product add column price int;
+##altering the table product to add quantity
+	alter table product add column quantity int; 
 
-alter table product add column quantity int; 
+##altering the table orders to add sellerId
+	alter table orders add column sellerId int references users(userId);
 
-alter table orders add column sellerId int references users(userId);
+##altering the table orders to add orderDate
+	alter table orders add column orderdate date;
 
-alter table orders add column orderdate date;
+##altering the table orders to add productid 
+	alter table orders rename column ordername to productId;
 
-alter table orders rename column ordername to productId;
 
+	 select * from category; 
+	 select * from orders;
+	 select * from permissions;
+	 select * from product;
+	 select * from roles;
+	 select * from users;
 
-select * from category; 
- select * from orders;
- select * from permissions;
- select * from product;
- select * from roles;
- select * from users;
-
+##inserting values to category	
 	insert into category (categoryname) values('Electronics'), ('HomeDecor'), ('Clothing'),('FoodItems');
+
+##inserting values to permissions	
 	insert into permissions (permissionname,grantedtorole) values('Sell',3), ('Buy',1), ('ChangeFormat',2),('ChangePrice',1);
+
+##inserting values to users	
 	insert into users (username,roleid,address) values('Jack',1,'Delhi'), ('Jill',2,'Mumbai'), ('Jane',3,'Jaipur'),('Harry',1,'Noida');
 
+##changing the permission of changeprice to seller(mistakenly given it to buyer)
 update permissions set grantedtorole=3 where permissionname='ChangePrice';
 
+##inserting values to product	
 	insert into product (productname,categoryid,price,quantity) values('Iphone13',1,80000,10), ('WallPainting',2,20000,5), ('LevisJeans',3,5000,20),('CadburyChocolate',4,100,50);
 
-create or replace function changes_product_quantity()
-      returns trigger
-      language PLPGSQL 
-      as $$
-        begin
-			if orders.productid <> product.productid then
-			UPDATE product SET quantity = quantity - 1 WHERE product.productid=orders.productid	;
-     		end if;
+##creating a function to decrease quantity of a product when it is ordered
+	create or replace function changes_product_quantity()
+	      returns trigger
+	      language PLPGSQL 
+	      as $$
+		begin
+				
+				UPDATE product SET quantity = quantity - 1 WHERE productid=new.productid	;
+	     		
 
-        return new;
-        end;
-      $$
-	  
-create trigger trigger_quantity_changes
-      after insert
-      on orders
-      for each row
-        execute procedure changes_product_quantity();
-		
-	insert into orders (productid,orderedby,orderdate,sellerid) values(1,1,NOW(),3), 
-	(2,4,Now(),3);
+		return new;
+		end;
+	      $$
+
+##creating a trigger for the function above		  
+	create trigger trigger_quantity_changes
+	      before insert
+	      on orders
+	      for each row
+		execute procedure changes_product_quantity();
+
+##inserting into orders			
+	insert into orders (productid,orderedby,orderdate,sellerid) values(1,1,NOW(),3), (2,4,Now(),3);
+	
+##creating a view for invoice for the buyer with userid=1	
+	create or replace view invoice1 as select * from orders where orderedby=1;
+	
+##creating a view for invoice for the seller with userid=3	
+	create or replace view invoiceseller as select * from orders where sellerid=3;
+
+##creating a view for invoice for the buyer with userid=4		
+	create or replace view invoicebuyer2 as select * from orders where orderedby=4;
+	
+	
+	
+	

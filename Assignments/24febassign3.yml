@@ -1,0 +1,49 @@
+db.edu.insertMany(
+   [
+	{
+		studentName: "Jack",
+		courseEnrolled: 
+		[
+			{
+				courseName: "Physics", Sessions: 20, assignments: 5
+			},
+			{
+				courseName: "Chem", Sessions: 30, assignments: 10
+			},
+			{
+				courseName: "Maths", Sessions: 40, assignments: 15
+			}
+		]
+	},
+		{
+		studentName: "Jill",
+		courseEnrolled: 
+		[
+			{
+				courseName: "Physics", Sessions: 20, assignments: 5
+			},
+			{
+				courseName: "Chem", Sessions: 10, assignments: 3
+			},
+			{
+				courseName: "Maths", Sessions: 15, assignments: 8
+			}
+		]
+	},
+		{
+		studentName: "Jane",
+		courseEnrolled: 
+		[
+			{
+				courseName: "Physics", Sessions: 10, assignments: 2
+			},
+			{
+				courseName: "Chem", Sessions: 20, assignments: 5
+			},
+			{
+				courseName: "Maths", Sessions: 30, assignments: 6
+			}
+		]
+	}
+   ]
+)
