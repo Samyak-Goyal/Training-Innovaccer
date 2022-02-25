@@ -1,0 +1,89 @@
+create table roles(
+      roleId SERIAL PRIMARY KEY,
+      rolename varchar(255)
+      
+    )
+	create table users(
+      userId SERIAL PRIMARY KEY,
+      username varchar(255),
+      roleId int REFERENCES roles(roleId)	
+      
+    )
+	
+	create table product(
+		productId SERIAL PRIMARY KEY,
+		productname varchar(255),
+		categoryId int REFERENCES category(categoryId)
+	)
+	create table permissions(
+		permisssionId SERIAL PRIMARY KEY,
+		permissionname varchar(255),
+		Grantedtorole int REFERENCES roles(roleId )
+	)
+	create table category(
+		categoryId SERIAL PRIMARY KEY,
+		categoryname varchar(255)
+	)
+	
+	create table orders(
+		orderId SERIAL PRIMARY KEY,
+		orderName int REFERENCES product(productId),
+		orderedBy int REFERENCES users(userId)
+	)
+		
+    alter table orders add column orderDate date
+	
+	insert into roles (rolename) values('Customer'), ('Administrator'), ('Seller')
+	
+	select * from roles
+
+
+alter table users add column address varchar(255);
+
+alter table product add column price int;
+
+alter table product add column quantity int; 
+
+alter table orders add column sellerId int references users(userId);
+
+alter table orders add column orderdate date;
+
+alter table orders rename column ordername to productId;
+
+
+select * from category; 
+ select * from orders;
+ select * from permissions;
+ select * from product;
+ select * from roles;
+ select * from users;
+
+	insert into category (categoryname) values('Electronics'), ('HomeDecor'), ('Clothing'),('FoodItems');
+	insert into permissions (permissionname,grantedtorole) values('Sell',3), ('Buy',1), ('ChangeFormat',2),('ChangePrice',1);
+	insert into users (username,roleid,address) values('Jack',1,'Delhi'), ('Jill',2,'Mumbai'), ('Jane',3,'Jaipur'),('Harry',1,'Noida');
+
+update permissions set grantedtorole=3 where permissionname='ChangePrice';
+
+	insert into product (productname,categoryid,price,quantity) values('Iphone13',1,80000,10), ('WallPainting',2,20000,5), ('LevisJeans',3,5000,20),('CadburyChocolate',4,100,50);
+
+create or replace function changes_product_quantity()
+      returns trigger
+      language PLPGSQL 
+      as $$
+        begin
+			if orders.productid <> product.productid then
+			UPDATE product SET quantity = quantity - 1 WHERE product.productid=orders.productid	;
+     		end if;
+
+        return new;
+        end;
+      $$
+	  
+create trigger trigger_quantity_changes
+      after insert
+      on orders
+      for each row
+        execute procedure changes_product_quantity();
+		
+	insert into orders (productid,orderedby,orderdate,sellerid) values(1,1,NOW(),3), 
+	(2,4,Now(),3);

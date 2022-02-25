@@ -1,0 +1,50 @@
+- what is GIT
+  - it is basically a version control system
+
+- what is difference between git and github
+  - git is an SCM server software which powers the GIT framwork
+  - GIThub is one of the SAAS (software as a service) provider company, like GITlab, bitbucket, etc.
+
+- steps
+  - git init --> to create git empty local repo
+  - create remote repo in github
+  - git remote add origin <url of repository> --> to connect local repo with remote repo
+  - create a file
+    - creating a file doesn't mean it gets added to git, i.e get tracked by git
+  - git add <filename> --> adds file to git
+    - git add . --> '.' means all the new files get added
+  - git status --> to check what is the current status of our repo, not the files in the fit managed folder
+    - when we tracked the file, it means it is ready to be staged
+  - we need to configure for the first time
+    - git config --global user.email "you@example.com" - type in the email
+    - git config --global user.name "Your Name" - type in the name
+  - git commit -m "<nmessage>" --> to stage the changes, and -m for typing a message to the commit
+  - git push --> to push the final changes
+    - git push --set-upstream origin master
+    - the personal token --> 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
+  - git clone <repo_name> --> to clone a already made remote repo to your local repo
+  - git pull --> to download the latest changes to local repo from remote repo
+  - git stash --> undo the changes possible only before stagin the changes i.e. commiting the changes to the remote repo
+
+- conflict 
+  - then the person because of whom there is conflict has to resolve it, and gets to decide what to do with the file
+
+- git log --> to check all the git logs
+  - git log --pretty=oneline --> to see the shorter version of the above command
+
+- git branching
+  - to prevent conflict at a larger level we use branching
+  - if we know that our change is sure to bring conflict, then we can use branching
+  - we will make our changes in our branch, separate from the previous branch
+  - when we are done with our changes, then we will merge the two branches
+  - when we merge, there is a large chance that conflict will happen, but it happen when our process is completed so it can be
+    handeled easily
+  
+  - git branch ---> how many branches are there, and * shows what is the current branch
+  - git branch <name> --> create a new branch by name 'name'
+    - newly create branch will be the exact copy of current branch
+  - git checkout <branchname> --> branch is changed to branchname
+    - when we push through the new branch, it will ask for upstream branch  and set origin to the new branch that we created
+  - git merge <branchname> --> type this command while you are in the target branch and keeping the branchname the name of the 
+    branch you want to merge
+    - git push --> to push the merge....needed

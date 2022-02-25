@@ -1,0 +1,427 @@
+- What is Database?
+  - database server - RDBMS type / NoSQL (eg. MongoDB)
+    - SQL-91 is the standard to write the queries
+    - database consists of
+      - table
+        - rows and colummns (a single column is a tuple)
+  - products
+    - postgresql, mysql, MariaDB, Oracle, MySQL server, Cassandra, MongoDB etc.
+
+
+- installation of postgres
+  - sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+  - wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  - sudo apt-get update
+  - sudo apt-get -y install postgresql
+  - sudop apt install postgtresql-contrib
+  - to install pgadmin4 - the interface
+    - curl https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo apt-key add
+    - sudo sh -c 'echo "deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+    - sudo apt update
+    - sudo apt install pgadmin4
+    - sudo /usr/pgadmin4/bin/setup-web.sh
+    - type http://127.0.0.1/pgadmin4 , to open pgadmin interface in browser
+  - to setup sever in pgadmin4
+    - sudo su - postgres
+    - psql
+    - create user <username> with password '<password>';
+    - create databse <database_name>
+    - grant all privileges on databse <databse_name> to <username>;
+    - ALTER USER user_name CREATEDB CREATEROLE LOGIN; --> gives username permission to create database
+
+- queries
+  - create table
+    create table roles(
+      roleId SERIAL PRIMARY KEY,
+      rolename varchar(255),
+      datecreated date,
+      isSystemRole bool
+    )
+
+
+    create table users(
+      userId SERIAL,
+      First_name varchar (50),
+      Last_name varchar(50),
+      roleId int REFERENCES roles(roleId)
+    )
+  - data types
+    - int
+    - float
+    - decimal
+    - char
+    - varchar
+    - date
+    - timestamp
+    - time
+    - bool
+    - enum ["val1", "val2"] -> provides choice between the values (more than 2 allowed options are there, then use enum)
+  - insert
+    insert into roles (roleId, rolename, datecreated, isSystemRole) values(1, 'admin', now(), true)
+  - select
+    - in production, dont use * instead if needed type all the column(s) name
+  - auto increment
+    - serial --> postgres
+    - identity --> MsSQL
+    - auto_increment --> mysql
+  - relationship
+    - primary key --> it is a unique key, can't be NULL. usually it is assigned to the ID of the table
+    - foreign key
+  - alter table
+    alter table users add column emailId varchar(100) unique
+    alter table users alter column emailId type varchar (150)
+  - IN
+  - NOT IN
+  - select * from pg_database --> gives details about all the databases
+  - SELECT * FROM pg_catalog.pg_tables WHERE schemaname = 'public' --> shows the tables and their details
+  - select * from information_schema.columns where table_name = 'movies';  --> to describe a table
+  - Wildcard character
+    - * (of linux) == % in postgres, and mysql too
+    - ? (of linux) == _ (underscore) in postgres
+  - BETWEEN <DATE> AND <DATE> -->  same can be done with, >= <date> and <= <date>
+    - better to use between..and, instead of logical operators. it is more optimised (in case of dates)
+  - select * from <table> LIMIT 5 --> gives first 5 records
+    - select * from <table> limit 5 offset 10 --> offset, so it removes first 10 characters and then shows 5 records
+    - in mysql, select * from <table> limit 5,10 --> it starts from 5th record and shows the next 10 records
+  - select * from <table> fetch first <n> row only --> gives the first n rows
+    - select top 5 from <table> --> same as others, but in MsSQL
+  - select * from <table> order by salary desc fetch first 5 row only  --> maximum 5 salary records, use this instead using order by limit, it is more optimal
+  - select * from <table> offset 10 rows fetch first 10 rows only -> start with 11th row and display first 10 rows
+  - to get the last row, order by <auto_incremented_column> desc
+  - select distinct <column_name(s)> from <table> --> unique records wrt to the comboination of columns after distinct
+  - select 'text1' || 'text2' as <column_alias> --> shows, text1text2 under column 'column_alias'
+    - select concat(text1,text2) from <table> --> same as above
+    - select concat_ws(' ', text1, text2) from <table> --> it takes the separator first and places it at the required location
+  - aggregate functions
+    - SUM, MAX, MIN, COUNT, AVG
+    - select count(*) from <table> --> tell the no of records in the table
+      - again, * will result into large time, we can use count(movie_id), like the index column, we will still get the same result
+      - provide the alias ("as")
+      - it will also neglect the null value, if count is used for a particular column. while using for * it counts null value too
+    - select sum(column_name) from <table> --> returns the sum of the values of the mentioned column
+    - select min(column_name) from <table> --> tells the minimum value from the column
+    - select max(column_name) from <table> --> tells the maximum value from the column
+    - select avg(column_name) from <table> --> tells the average value from the column
+    - in case of null values, the above operation doesn;t count it, they just neglect it as it doesn't hold any value
+  - group by
+    - select <xxxxxx> from <table> group by <column_name> --> in place of xxxxx, use the column name used to group by, insted of *
+    - we can also use two or more columns to group by
+  - having
+    - we can't use where with aggregate functions, so we use having
+    - having is mainly used with group by
+    - ...group by having count(column_name) >5 --> shows the records with count of the column name values >5
+    - we can use where in combination with having, but where clause mustn't contain aggreagate function
+  - select 1+2 as ans --> these kind of calculations are also possible
+  - table relationships
+    - one to one
+    - one to many
+    - many to many
+  - JOINS
+    - INNER join
+      - select directors.director_id,
+        directors.first_name,
+        directors.last_name,
+        movies.movie_name
+        from directors
+        inner join movies
+        on directors.director_id = movies.director_id
+        where movies.movie_lang = 'English'
+      - select directors.director_id,
+        directors.first_name,
+        directors.last_name,
+        movies.movie_name,
+		    movie_revenues.domestic_takings
+        from 
+        directors
+
+        inner join movies		
+        on directors.director_id = movies.director_id 
+
+        inner join movie_revenues on
+        movies.movie_id = movie_revenues.movie_id
+        --> the above is the method to join 3 tables, we have to type inner join separately and use on with it separately too
+    - LEFT join
+      - select d.director_id,
+        d.first_name,
+        d.last_name,
+        mo.movie_name
+        from directors d
+        left join
+        movies mo
+        on d.director_id = mo.director_id
+    - RIGHT join
+      - select d.director_id,
+        d.first_name,
+        d.last_name,
+        mo.movie_name
+        from movies mo
+        right join
+        directors d
+        on d.director_id = mo.director_id
+    - FULL join
+      - select d.director_id,
+        d.first_name,
+        d.last_name,
+        mo.movie_name
+        from movies mo
+        full join
+        directors d
+        on d.director_id = mo.director_id
+      - JOINS are more time efficient than subqueries
+  - UNION
+    - merge tables but the same column number from them
+    - select first_name,last_name from actors UNION
+      select first_name, last_name from directors
+    - if there is a duplicacy in the tables, it shows one instance only
+    - it is like the (U) symbol in mathematics
+  - UNION ALL
+    - it doesn't remove the duplicate values, it keeps them all
+  - INTERSECT
+    - it does the same function as the intersect in maths
+    - select first_name from directors INTERSECT select first_name from actors
+  - EXCEPT
+    - just opposite of INTERSECT
+    - select first_name from directors EXCEPT select first_name from actors
+  - SUBQUERIES
+    - non correlated subquery
+      - select movie_name, movie_length from movies where movie_length > (select avg(movie_length) from movies)
+        --> here we haven't hardcoded the avg value, instead we kept it dynamic
+    - correlated subquery
+      - select
+        d1.first_name,
+        d1.last_name,
+        d1.date_of_birth,
+        d1.nationality
+        from directors d1
+        where date_of_birth = (select min(date_of_birth) from directors d2 where d2.nationality=d1.nationality)
+      - using IN
+        - select movie_name from 
+          movies
+          where movie_id IN
+          (select movie_id from movie_revenues where
+            international_takings > domestic_takings)
+          
+          ALTERNATE to above command (not same result, just showing the use)
+
+          select 
+          mo.movie_id,
+          mo.movie_name,
+          d.first_name,
+          d.last_name
+          from movies mo
+          join
+          directors d
+          on mo.director_id = d.director_id
+          where movie_id IN
+          (select movie_id from movie_revenues where
+            international_takings > domestic_takings)
+  - string functions
+    - select 'daksh bindal' --> return daksh bindal
+    - select UPPER('abc') --> uppercase
+    - select LOWER("ABC") --> convert to lower case
+    - select INITCAP('abc') --> capitalise initial letter for space separated keywords
+      - also applicable to column of tables
+    - select left('india',3) --> shows 3 characters from left
+      - select left('india', -2) --> it will remove last 2 characters. and prints the remaining
+    - select right('india',3) --> shows the right 3 characters, here 'dia'
+    ---- space is included in both left and right
+    - select reverse('india') --> reverses the string
+    - select substring('india',x,y) --> starting from x, displays the next y characters (including xth letter). for first charcter x=1
+    - select replace('i am from india','india','USA') --> original text, text to replace, text to replace with
+    - select split_part('firstname.lastname@google.com','@',1) --> splits it into parts, the separator is @ (here),separator is not included anywhere, 1 is for showing the 1st part
+    - select adte_of_birth::TEXT from directors --> coonvert dob which was originally date data type to text data type using the shown syntax
+    
+
+- codes
+  - code 1.
+    # -- Database: innov
+
+    # -- DROP DATABASE IF EXISTS innov;
+    # -- drop table roles;
+    #   create table roles(
+    #     roleId SERIAL PRIMARY KEY,
+    #     rolename varchar(255),
+    #     datecreated date,
+    #     isSystemRole bool
+    #   )
+
+
+    #   create table users(
+    #     userId SERIAL,
+    #     First_name varchar (50),
+    #     Last_name varchar(50),
+    #     roleId int REFERENCES roles(roleId)
+    #   )
+
+    #   insert into roles (roleId, rolename, datecreated, isSystemRole) values(1, 'admin', now(), true)
+
+    #   select * from roles;
+
+    #   alter table users add column emailId varchar(100) unique
+    #   alter table users alter column emailId type varchar (150)
+    #   select * from users
+
+    # - delete from <table_name> --> deletes the data from the table but not the table
+    # - drop table <table_nbame> --> delete the whole table
+    # - truncate also does what delete does, but truncate doesn't use where cluase, while delete does
+  - code 2
+    # -- Database: innov
+
+    # -- DROP DATABASE IF EXISTS innov;
+    # -- drop table roles;
+    # create table roles(
+    #   roleId SERIAL PRIMARY KEY,
+    #   rolename varchar(255),
+    #   datecreated date,
+    #   isSystemRole bool
+    # )
+
+
+    # create table users(
+    #   userId SERIAL,
+    #   First_name varchar (50),
+    #   Last_name varchar(50),
+    #   roleId int REFERENCES roles(roleId)
+    # )
+
+    # insert into roles (roleId, rolename, datecreated, isSystemRole) values(1, 'admin', now(), true)
+
+    # select * from roles;
+
+    # alter table users add column emailId varchar(100) unique
+    # alter table users alter column emailId type varchar (150)
+    # select * from users
+
+    # -- insert into roles (rolename, datecreatd, issystemrole) into
+    # -- select rolename, datecreated, issystemrole from rolesold where issystemrole is true
+
+    # update roles set rolename = 'Sr. Manager' where roleid= 3
+  - insert into roles (rolename, datecreatd, issystemrole) into
+    select rolename, datecreated, issystemrole from rolesold where issystemrole is true
+      --> the above query insert the output from rolesold table to the roles table
+
+- CRUD operation
+  - create
+  - read --> select command
+  - update --> update roles set rolename = 'Sr. Manager' where roleid= 3
+  - delete --> delete from roles where roleId= 3, deletes the record for roleid=3
+
+
+
+  
+- TODO
+  - find the optimisation techniques
+
+# - to run
+#   - sudo su - postgres
+#   - psql
+
+
+- JSON
+  - JAVASCRIPT OBJECT NOTATION
+  - In mongo db data is stored in json formal not in tabular format
+  -
+    [
+      {
+        'column1':value,
+        'column2':value,
+        'column3':value
+      },
+      {
+        .......
+      }
+    ]
+  - data in each curly bracket is row data
+  - the above data is a text format of json
+  - in JSONB, the data is stored in binary format, so it would be faster than the text format
+  - select '{....}' --> the content inside the {} brackket is called json object which will be stored in the tuple as a text format
+  - select '{"title":"i am iron man"}'::JSON --> this is the format if we want to convert text to json
+  - if there are spaces in {} before "" then convert to jsonb format using ::jsonb
+  - create table books(
+      bookId serial primary key,
+      bookinfo jsonb
+    )
+    insert into books (bookinfo) values ('{"title":"book 1"}')
+    insert into books (bookinfo) values ('{"title":"book 2"}')
+    insert into books (bookinfo) values ('{"title":"book 3"}')
+    select * from books
+
+    in this json object will be inserted into the table
+  - select bookId, bookinfo->'title' from books --> this gives the value corresponding to the title in bookinfo column in the string format
+  - select bookId, bookinfo->>'title' from books --> here it will give the content inside the value of the key
+  - update books set bookinfo =bookinfo || '{"author":"authorname"}' where bookId=1 --> it will upodate
+    - now if we will run this query again, we would not see other author key, but update the previous one
+      this is only possible in postgre when done with json
+  - update books set bookinfo = bookinfo || '{"author":"author 1", "category":"science"}' where bookinfo->> 'author'='authorname new' --> see the >> used, used to change the content
+  - update books set bookinfo = bookinfo - 'category' where bookinfo->> 'author'='author 1' --> here the category key will be removed
+  - to convert a simple rdbms table to format of json object
+    - select row_to_json(directors) from directors
+    - select row_to_json(mydirectors) from (select director_id, first_name, last_name from directors) as mydirectors
+      --> it converts the specified column to json object only
+  
+- VIEWS
+  - virtual representation of any statement and you give a particular name to that statement which act as virtual table where you can perform operations without affecting the actual table 
+  - virtual table basically
+  - create or replace view moviedetails as <query> --> creats a view
+  - select * from moviedetails --> see the view
+  - it basically behaves exactly like a table and doesn't bother the original tables
+  - it has no physical presence
+  - views cant be modified in postgres
+
+- Triggers
+  - a trigger is defined as any event that sets a course of sequence or action in a real time environment
+  - events
+    - insert, update, delete, truncate
+    - when
+      - before the event happens
+      - after the event has happened
+      - instead of the event,  we are bypassing the event and doing something of our own
+    - level
+      - table
+      - row
+  - triggers are applied on tables and views only
+  - a FUNCTION is a logic which will be executed on triggered event
+    - way to create function and trigger
+
+      create table players(
+        player_id serial primary key,
+        name varchar(100)
+      );
+      
+      create table players_audits(
+        player_audit_id serial primary key,
+        player_id int not null,
+        name varchar(100),
+        edit_date timestamp not null
+      )
+
+      insert into players (name) values('Virat Kohli');
+      insert into players (name) values('Ms Dhoni');
+      insert into players (name) values('Rohit sharma');
+
+
+      create or replace function fn_player_name_changes_log()
+      returns trigger
+      language PLPGSQL #-- language
+      as $$
+        begin
+          if new.name <> old.name then
+          insert into players_audits (player_id, name, edit_date) values (old.player_id, old.name, now());
+          end if;
+
+          return new;
+        end;
+      $$
+
+      # -- creating a trigger for the function on the table player
+      create trigger trigger_player_name_changes
+      # --before|after|instead insert|update|delete|truncate
+      before update
+      on players
+      for each row
+        execute procedure fn_player_name_changes_log();
+
+      update players set name = 'Mahendra singh dhoni' where player_id= 2
+      update players set name = 'Sourav Ganguly' where player_id=2
+      select * from players
+      select * from players_audits;

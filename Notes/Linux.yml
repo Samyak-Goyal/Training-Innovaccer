@@ -1,0 +1,309 @@
+ - linux facts 
+  -Linux case senstive
+  -linus torvalds developed linux kernal, but not linux operating system
+    -kernal is a layer acts a mediator btw hardware and software
+  - linux kernal is not an OS. it is a middle layer between hardware and user
+  - linux is all about CLI (command line interface/interpreter) and not the UI
+
+-file system format
+  -ntfs (network file system) is used in windows to store files, i.e. the file system
+  -ext3, ext4, xfs, ntfs. fat are used in LINUX
+  -MAC by default doens't support NTFS, making it difficult to access files from windoes per se.
+  
+- commands
+  - man --> for documentation
+  - man date --> help regarding date command
+  - cal --> gives the calender
+  - bc --> launches a calculator
+  - whatis <command_name> --> tells what command_name does
+  - pwd --> tells your location with whole path
+  - cd .. --> to go outside of the folder you are in
+  - mkdir --> to make a folder
+  - cp --> copy the files/folders to one location to othe location
+    - cp xx.txt x_x.txt --> cp is command, second one is source and third one is destination
+    - cp x_x.txt ../new.txt --> here copied to the previous folder (.. is used to go back)
+    - when copied a folder to other folder and the source folder already has some sub folders inside it and some files,
+      then the folder will not be copied only the files will be copied
+      To copy the folder also use :: cp -R folder1 folder2/ --> R means to copy the folders recursively
+    - cp x1.txt x2.txt ../myfolder2/ --> here we are copying file x1 and x2 to myfolder2, so we can say that myfolder2
+      is the destination and other are the files to be copyed
+  - mv --> used for move (cut-paste)
+    - all the commands of cp are available to mv 
+    - can be used to rename the file also, ;). move the file to same location like:: mv earlier.txt newname.txt
+  - rm --> to remove
+    - rmdir --> remove directory
+    - rm filename --> remove file named filename
+    - rm filename filename2 --> remove both files
+    - rm -rf --> here rf means forceful removal recursively, used when want to delete a directory
+  - unlink --> removes the file,but is not used for recursive or forceful removal
+  - ls --> to list all the subcontents
+    - ls -ll --> gives the listing with all the details like, permissions flags user group time name
+    - explore more using --help
+  - cat --> to read the content of the file (readable file)
+    - if a file is like mp4, jpeg then it will open the encoding
+    - use --help --> or man to explore more
+  - head filename --> displays top 10 lines
+    - head -n x --> here x means the top x lines to display
+  - tail filename --> shows the bottom 10 lines
+    - tail -n 3 filename --> shows the bottom 3 lines
+    - tail -n filename --> where n will be the number of lines
+  - particular_range_lines:- we can use 
+    - awk NR like:- awk 'NR >= x && NR <= y' filename --> here lines from x to y will be printed
+    - sed -n 'x,y p' filename --> here lines from x to y will be printed, p represent pattern printing
+  - touch xyz --> creates xyz but an empty file
+  - echo --> to print to the consol
+    - echo "hi" > filename --> here we are writing hi to the filename
+      also the content is overridden, everything is deleted and then hi is written
+    - '>' is called redirection, can be used to write in both existing and non existing file
+    - '>>' used to add after all the content of the file, not override
+    - '&>' is redirection, & means both standard output and standard error, will be redirected
+  - '>' and a file is named after the symbol, the consol output will be entered into the file
+  - nano editor can be used from the terminal itself
+
+-what is Root?
+  - root account --> most powerful user account
+  - root as / --> this is the first directory, also known as root directory
+  - Root Home --> this is a home directory of a ROOT user; /root
+
+- touch abc{1..9}pqr.txt creates 10 files named, abc1pqr.txt, abc2pqr.txt....and so on\
+
+- wildcard characters
+  - * --> it represents 0 or more characters
+  - ? --> for a single character, not multiple characters
+  - [] a[bc] means there should be b or c after a
+  above three can be used with ls, like ls abc* etc etc
+
+- root folder contents
+  -bin folder in root folder is the folder container executables files
+  -boot folder is responsible for loading the OS, grub is the boot loader and .img file is we can say the graphical file for our OS
+  -dev folder, all device files and device related drivers are here
+  -etc folder contains host specific system configuration
+  -home folder displays the user home folder, i.e. the no of users equals the no. of folders in the home folder
+  -lib is like a background for bin, like a backend
+  -media is the media drive attached 
+  -mnt folder is the mounted filesystem (externally), like pendrives
+  -sbin folder contains the ubuntu related binaries, i.e. the system binaries
+  -var folder, is a variable folder. contains all the source code and logs
+
+- common commands
+  - whoami --> current user name
+  - alias cls=clear --> change command name, maybe use for shortcut. works on the particular terminal only
+  - unalias cls --> is also there
+  - hostname --> hostname of your computer; change hostname using hostname <newname>
+  - shutdown <when> --> shutdown your pc, duh!.
+    - shutdown now --> means shutdown now
+    - shutdown -r now --> restart the machine
+  - printenv --> loads all the environment variable
+    - echo $<name of env variable> --> print the value of the environment variable. please note the $ sign put before the env var name
+    - env var_name= value --> makes a new (or change the value if existing) environment variable named env var_name, with value as 'value'. Eg. MYKEY=MYVAL
+  - free -h --> tells available RAM
+    - swap row header tells the swap memory available
+    - free cmd withour any -h flag, tells the memory in bits, which is not exactly readable
+  - lscpu --> tells info about the hardware
+  - df -h --> checks the physical storage ability
+    - df -x squashfs --> squashes the system files
+  - history --> tells all the command you have executed till then
+    - !<number_of_command_in_history> --> runs the command at the specified number (note the exclamation mark)
+  - sudo apt-get update --> updates the list of all the software providers on our local pc i.e downloads the list of avaialable updates
+  - sudo apt upgrade --> upgrade the upgradable packages
+  - ifconfig --> tells the network card and other network related documents
+    - lo:: is the local host
+    - gateway :- technically, router IP address
+  - sudo apt install <package_name> --> installs the package
+  - sudo apt remove <package_name> --> removes the package
+    - apt == apt-get
+    - certain OS uses yum instead of apt, like in SaintOS
+  - dpkg --> is the package manager of debian (.deb) files
+  - apt is the package manager, also works as installer
+  - apt-get purge <package_name> --> same as remove the diff is that it also removes the config file if created by the package
+  - sudo apt clean --> it basically cleans all the local cache folder and files created by apt. this is needed when due to some operation apt is not able to 
+    do its designed function
+  
+- Symlinks
+  - stands for Symbolic Links
+  - what is Inode?
+    - it is a pointer or number of a file in hard drive, it is a identification of a folder or a file in a numeric format
+    - ls -li --> we can see the inodes at the very starting i.e. the location
+    #- renaming the same file using mv, doesn;t change the file inode
+  - types of symlinks
+    - soft symlink 
+      - points to the storage location of the file
+      - ln -s ../<source_folder>/<filename> --> s for soft link, ln for link. it creates a link of the filename at the dest folder. so we have to type the
+        command in the destination folder. when we remobve the file from software then the shortcut at the dest folder will be popinting nowhere, so its get corrupted
+        if we change the name too, the link will get broken. if we change the name back again, then link gets restored
+      - ln -s ../<source>/filename <newfilename> --> it changes the link name at the destination folder to newfilename.
+      - ../<source_folder>/<filename> , it means the path to the source and the file to be linked
+    - hard symlink
+      - ln ../<source>/filename --> no flag is there. 
+        the difference is that there will be no effect if the file is moved, renamed or deleted etc. it will still show the content
+      - hardlink points to the content of the file
+
+- file permission
+  - 3 types of permissions
+    - r --> read (even to list, r permission is required)
+    - w --> write (to edit or write in a file this permission is required)
+    - x --> execute (to run i.e. to execute the file, this permission is requried)
+  - 3 levels where the permission can be configured / applied
+    - u --> user level
+    - g --> group level
+    - o --> other (everyone on the system)
+  - ls -l, -rw-rw-r--, first three characters after '-' says, the current USER ca, read write but not execute, the next three signifies, the current GROUP of user can read write but not execute, and the remaining 3 characters
+    means the other can only read the file
+    the first character (in this case -) can be -, l, or d. - means it is file, d means directory and l means link
+          user                group             others
+    read write execute    read write exec   read write exec
+      1     1     0         1     1   0       1    0     0
+  - numerical permission table
+    https://www.tutorialspoint.com/unix/unix-file-permission.htm
+
+    Number	Octal Permission Representation	                      Ref
+    0	            No permission	                                  ---
+    1	         Execute permission	                                --x
+    2	          Write permission	                                -w-
+    3	 Execute and write permission: 1 (execute) + 2 (write) = 3	-wx
+    4	           Read permission	                                r--
+    5	 Read and execute permission: 4 (read) + 1 (execute) = 5	  r-x
+    6	 Read and write permission: 4 (read) + 2 (write) = 6	      rw-
+    7	 All permissions: 4 (read) + 2 (write) + 1 (execute) = 7	  rwx
+  
+  - chmod xxx <file/foldername> we can change the permission
+  - chmod 000, no permission to anybody
+  - chmod 700, read write execute to user and nothing to rest
+  - chmod 777, all permission to everyone
+  - chmod calculator:: https://chmod-calculator.com/ 
+
+- file ownership
+  - 2 type of users who can own a file/folder
+    - owned by user who owned the group
+    - owned by user who owns the file
+  - chown --> change the ownership of the file at user level
+    - chown <newuser> <filename>
+  - to change the owner group of the file
+    - chgrp <newgroup> <filename>
+
+- user and groups
+  - groups --> (mind the 's') command will tell about all the group currently logged in user is part of
+    - eg. in this pc it shows tempadmin sudo input, so tempadmin is part of; tempadmin, sudo and input
+      it being a part of sudo makes it able to run sudo commands
+  - groups <username> --> tells how many and what group <username> is part of
+  - there are two group file in /etc and /bin, the one in etc is a txt file, which contains all the details of groups and
+    the other in bin is the executable file which gets executed when "groups" command is given
+  - sudo groupadd <groupname> --> makes a new group, we can check the gorup by going to /etc/group
+  - usermod --> is the user modification command
+    - sudo usermod -a -G <in which group to add> <user to modify> --> adds the user to the specified groups, user should be existing
+  - id --> tells the uid along with groups
+  - sudo useradd <user_name> --> to add a new user. when we create a user, a group of same name as user gets created
+    - we can use usermod to add the user to group(s)
+    - by default the new user added doesn't have any directories, so there is technically no desktop
+      To solve, the problem we use flag
+        sudo useradd -m <user_name> --> create a user with the home directory
+    - sudo useradd -G <groupnam> <username> --> adds the user to the mentioned group
+  - groupdel <group_name> --> deletes the group
+  - passwd <user_name> --> then send the new password
+  - su <username> --> gets us logged in as the username from the shell itself
+  - gpasswd --> to set group password (not generally used)
+  - sudo userdel <username> --> deletes the user but not the home dir. for this user
+    - sudo userdel -r <username> --> deletes the home dir of that user too
+  - sudo cat sudoers --> tells about all the users with sudo privilages
+
+- we have to keep in mind that all the result we are getting for a particular cmd are coming from a physical
+  file somewhere. 
+
+- processes and jobs
+  - application --> its a program in your computer like calculator. I can also be called as service
+  - Script --> written in a file or file package in a way it can be executed. Like shell script, bash script
+  - Process --> when you run a application a process gets created for the application. It also generated process Id (PID)
+  - Daemon --> something runs in the background and executes the service until the servuice completes the work, eg. alarm service
+  - Thread --> every process can have one or more thread associated with it.
+  - Job --> it runs a service/application or a process n the scheduled or a given time. job management. CRON JOB
+
+  -processes and commands
+    - systemctl start <servicename> --> to start, restart any service
+    - systemctl status <servicename> --> to check the status of service
+    - systemctl stop, systemctl restart (or reload), are also there, use them with service name
+    - sudo service <servicename> start --> alternate wway of systemctl, just the older version
+    - sudo systemctl disable <servicename> --> disabled meaning when pc is restarted the service will not automtically enabled
+    - sudo systemctl enable <Servicename> --> just opposite of the above one
+    - sudo systemctl list-unit --all --> gives all the process running on the pc
+    - ps --> also to see the current processes in that terminal
+    - ps -e --> all the running processes
+    - ps aux --> processes listed in free bsd format, a little more detailed
+    - ps -ef --> all running process but in full format (f stands for full format)
+    - ps -u <username> --> to see services executed by specified user
+    - ps -fu <username> --> to see the full format of the above command
+    - top --> all the processes, but the real time info
+      - top -u <username> --> list processes own by user username
+      - press C, to see the full path
+      - press K and enter the process id to kill a particular process
+    - ps -e | grep '<searchtext>'' --> to search a particular service
+    - kill <process_id> --> to kill the process with that pid. can b used to kill 
+    - grep can be used with other commands as well
+    - kill -9 --> used to forcefully kill a process
+
+- SSH configuration
+  - sudo apt install openssh-server --> download and install the ssh server
+  - sudo systemctl start ssh --> to run the ssh service
+  - PuTTY, download (for windows) this software to connect to the ssh (download on the other machine to be connected to ssh machine)
+  - to connect with other ubuntu
+    - ssh <username>@<IP address> --> you have to know the username and IP address of the device to be connected
+  - now you will be connected to the ssh machine
+  - using this only ssh is connected, GUI is not connected
+  - use 'exit' to return to the earlier machine
+
+- ping <domain name> --> to see the dns and the ip on which that is hosted
+
+- nslookup <the above ip> --> tells the name server of that IP
+
+- curl <domainname> --> show what is there when we type the domain name. in case of google.com, shows the html code
+  - curl -O <url> --> we can download the file 
+
+- wget <url> --> download the file (even the html file)
+
+- shell script
+  - #!/bin/bash --> path of bash shell
+  - ./<filename> --> to run the file (in that folder only)
+  - sudo ./<filename> --> internal commands will get sudo access automatically
+  - see the scripts too
+
+- memory management command
+  - df -h | grep -v tmpfs --> it will show the physical storage ability but removing the entries with tmpfs in them (we used -v)
+  - df -h --> already discussed
+  - du -ah <location> --> it will list out every file and folder at the location
+    - du -ah <location> | sort -nr --> if suppose the location has very large files, then we can sort them in descending order
+    - du -ah <location> | more --> if there are lot of entries, not able to fit into a single page, we use more to get option like that of read more
+  - check the processes
+    - top
+    - free -h
+    - lsmem --> shows the actual RAM, but in blocks
+    - cat /proc/meminfo --> same shit as that of lsmem
+    - vmstat --> swap memory details
+    - pmap <pid> --> ram details for a particular process
+    - sudo dmidecode --> hardware details (system configuration)
+    - lscpu --> details of cpu like no. of sockets etc.
+    - cat /proc/cpuinfo --> same shit as lscpu, format is diff
+    - iostat -y <time_in_seconds> --> it shows disk details after every mentioned no of seconds
+      - external package, install it using apt install sysstat
+  - network commands
+    - ifconfig
+    - sudo tcpdump -i <network_card_name> --> traffic through this network card
+      - sudo tcpdump -i <network_card_name> | grep <search_text> --> detail about the particular url
+    - netstat -plnt --> connected internet connection
+    - ss -plnt --> same shit as netstat, but more details
+    - uptime --> how long this machine is up
+
+- firewall 
+  - types of firewall
+    - iptables --> older version
+    - firewalld --> new firwall
+    - ufw -> uncomplicated firewall (the best one)
+      - can allow or stop any port
+      - enable/disable this firewall
+      - sudo ufw allow <port_no> --> allow this port no
+      - sudo ufw deny <port_no> --> deny a port number
+
+
+- TODO
+  - develop a shell script to know if any new recent appears in the last 5 days of the time
+  - try every command
+  - rebasing branch
+  - put the shell scrip in git, make branches, make changes, and merge
