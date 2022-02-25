@@ -21,7 +21,7 @@
   - git commit -m "<nmessage>" --> to stage the changes, and -m for typing a message to the commit
   - git push --> to push the final changes
     - git push --set-upstream origin master
-    - the personal token --> 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
+    - the personal token --> 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
   - git clone <repo_name> --> to clone a already made remote repo to your local repo
   - git pull --> to download the latest changes to local repo from remote repo
   - git stash --> undo the changes possible only before stagin the changes i.e. commiting the changes to the remote repo
