@@ -425,3 +425,96 @@
       update players set name = 'Sourav Ganguly' where player_id=2
       select * from players
       select * from players_audits;
+
+
+- MONGO DB
+  - data is never stored in rows and column
+  - maintained in json format
+  - no need to establish relationship
+  - collection==tables, document=row
+  - collections are there, everything is clubbed into json format
+  - the database style is known as NoSQL
+  - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/ 
+    - follow the above tutorial to install mongodb
+    - the mongod stands for mongo+daemon
+    - mongodb is the database
+    - to start mongodb, type mongo in the terminal
+    - there are 3 options for user interface; monogdb compass, robo3t/studio3t, shell/terminal
+    - download robo3t or studio3t, robo is free version of studio
+    - unzip the file and go to bin folder and run the robo3t script using ./robot3t, as it is an executable
+      - give the chmod permissions if needed
+    - do the formatlities
+    - create a new connection, test it and connect it
+
+  - working on mongodb
+    - open terminal or open through right clicking on server menu and click open shell
+    - use <db_name> --> switch to database, if doenst exists create the database
+    - db.Employee.insertOne --> allows us to insert "one" record into the newly created table(employee)
+      db.Employeee.insertOne(
+        {
+          firstname: "Nilesh",
+          lastname: "Parekh",
+          email: "nilesh@google.com",
+          age: 45,
+          isMarried: true
+        }
+      ) 
+      --> creates new record
+      --> this will auto insert an auto incremented id key in this document
+      --> auto increment SHA256 unique identifier
+      --> id is the alphanumeric, not numeric
+    - db.Employeee.insertMany([{
+          firstname: "Nitin",
+          lastname: "Shah",
+          email: "nitin@google.com",
+          age: 42,
+          isMarried: true
+        },
+        {
+          firstname: "Sachin",
+          lastname: "Shah",
+          email: "sachin@google.com",
+          age: 40,
+          isMarried: true
+        }]) 
+      --> can insert mulitple records using insertMany
+      --> used [] to make it an array for easy insertion
+    - db.RecordsDB.insertMany(
+        [
+          { 
+            name: "Marsh", age: "6 years", species: "Dog", 
+            ownerAddress: "380 W. Fir Ave", chipped: true
+          }, 
+          {
+            name: "Kitana", age: "4 years", 
+            species: "Cat", ownerAddress: "521 E. Cortland", chipped: true
+          }
+        ]
+      ) 
+      
+    - db.RecordsDB.find() 
+    - db.RecordsDB.find( { status: "A" }, { item: 1, status: 1 } ) --> Specific fields 
+    - db.inventory.find( { status: "A" }, { item: 1, status: 1, _id: 0 } ) --> ignore _id 
+    - db.inventory.find( { status: "A" }, { status: 0, instock: 0 } ) --> return all but these fields 
+    - db.RecordsDB.find({"species": "Cat"}) 
+    - db.RecordsDB.findOne({"age": "8 years"}) 
+    - db.RecordsDB.updateOne({name: "Marsh"}, {$set:{ownerAddress: "451 W. Coffee St. A204"}}) 
+    - db.RecordsDB.updateMany({species: "Dog"}, {$set: {age: "5"}}) 
+    - db.RecordsDB.replaceOne({name: "Kevin"}, {name: "Maki"}) 
+    - db.RecordsDB.deleteOne({name: "Maki"}) 
+    - db.RecordsDB.deleteMany({species: "Dog"}) 
+    - db.RecordsDB.count() 
+    - db.RecordsDB.find().limit(10) 
+    - db.RecordsDB.find() 
+    - db.RecordsDB.find( { status: "A" }, { item: 1, status: 1 } ) --> Specific fields 
+    - db.inventory.find( { status: "A" }, { item: 1, status: 1, _id: 0 } ) --> ignore _id 
+    - db.inventory.find( { status: "A" }, { status: 0, instock: 0 } ) --> return all but these fields 
+    - db.RecordsDB.find({"species": "Cat"}) 
+    - db.RecordsDB.findOne({"age": "8 years"}) 
+    - db.RecordsDB.updateOne({name: "Marsh"}, {$set:{ownerAddress: "451 W. Coffee St. A204"}}) 
+    - db.RecordsDB.updateMany({species:"Dog"}, {$set: {age: "5"}}) 
+    - db.RecordsDB.replaceOne({name: "Kevin"}, {name: "Maki"}) 
+    - db.RecordsDB.deleteOne({name: "Maki"}) 
+    - db.RecordsDB.deleteMany({species: "Dog"}) 
+    - db.RecordsDB.count() 
+    - db.RecordsDB.find().limit(10) 

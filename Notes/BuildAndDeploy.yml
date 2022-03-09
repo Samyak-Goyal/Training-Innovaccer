@@ -1,0 +1,490 @@
+- DevOps -> developing operations
+- TestOps --> testing operations
+  - selenium --> E2E test tools
+- DevSecOps --> development security using various complainces and various checks are happened
+
+
+- Pipelines
+  - continuous development (CD)
+  - continuous integration (CI)
+  - these are used to deploy and integrade codes and stuff on the go, so that others don't have to wait to use it
+  - tools exist such as jenkins, docker, kubernatives
+
+- Docker is software for a concept called Container
+
+- Containerization solution providers
+  - AWS container --> docker
+  - Azure container --> docker
+  - google --> docker
+  - Kubernates --> docker
+
+- virtual machine
+  - host -> hypervisor -> guestOS -> Bins/libs -> apps
+  - host is the OS on which virtual machine is enabled
+  - hypervisor is what facilitates the use of virtual machine. It is an virtual engine basically. Mainly present in windows
+    - alternatives are, redHat virtualisation, virtualbox etc.
+  - guestOS, the OS running on the VM
+  - Bins/libs are the files
+  - apps are the application which are installed on the guestOS
+
+  - problem with VM --> just for one application, it carries whole OS along with its Kernel, drivers
+    hardwares, library etc which might even not be required by our app.
+    These layer already exist with out HostOS so these are kind of unnecessary
+    - for eg, suppose host already has firewall system, but guestOS will also have its firewall, so it would be 
+      an unnecessary load, but it is a necessary dependency of VM.
+
+- Containerization
+  - using docker engine we club/containerize the whole software bundle and librarier required and use it on docker engine
+  - it is executed on host operating system 
+  - so only necessary things comeup in docker
+  - container are virtual environment, but different from virtual machine
+  - like hypervisor here is docker engine (it is not alternate!)
+
+- Docker Components
+  - docker engine
+  - docker desktop
+  - docker hub
+  - docker compose
+
+- Docker Engine
+  - in linux it is natively supported, can be installed as a package
+  - it is not in macos or windows
+  - it uses linux internally
+  - Docker Desktop --> available for windows and mac
+    - has to be run as a daemon or service so that it can run docker engine and utilities
+  - to install docker engine on linux
+    - https://docs.docker.com/engine/install/ubuntu/
+  
+- Docker Image
+  - image is a read only bundle of a software through which we can actually create the software
+  - docker hub --> all the images are listed here
+  - sudo docker run node [or] sudo docker pull node --> download the node image
+    - pull downloads the image and run downloads the image and creates the container
+    - docker run node --dns 8.8.8.8 --> if above command doesn't run
+    - in front of digest there will a long alphanumeric key
+      - that is the SHA key
+    - sudo docker images
+      - if we see for node, it is much larger when downloaded from website
+        - it is because it is already set up according to the hostOS
+    - image being a readonly entity allows us to create N number of containers keeping the image same
+    - sudo docker run node --> mainly creates a container
+      - if run again, then another container will be created
+    - sudo docker ps --> shows the running containers
+      - sudo docker ps -a -->shows all the container, even if they exited
+    - by default container doesn't run any program, so once created it gets exited
+    - total size of containers of one image is equal to the size of the image, by default
+    - after creation of container, we can't delete the image. to delete the image we have to remove the container not just exit it
+    - sudo docker rm <container_id or container_name> --> removes the container
+    - sudo docker run -it <image_name> --> runs the image and allows us to interact with the container
+    - node is not in the host that why it shows command not found, but
+      on running through docker, it will work. so node is in docker engine
+    
+    - Building Image
+      - go to the folder where DockerFile is
+      - docker build . --> builds the iamge with content of DockerFile
+      - we can include more than one file in DockerFile using
+        - FROM node
+          FROM mongo
+      - it will create an image containing the properties of both
+        - so if we make a container out of it, it will have properties of both image
+      - docker build -t <name:version> . --> image with name and version
+        - always try to give version
+      
+
+- nodejs app
+  - go to the folder of DockerFile
+  - sudo install npm
+  - npm init --yes --> initializes the npm
+  - npm install express --> installs express
+  - node_modules folder created after installing express is heavy folder
+  - when we installed express, it was listes as dependency in the package.json file 
+  - so we can delete that folder if we want to send the nodejs app, we can just send the package.json file and then run
+    - npm install --> installs the dependencies
+  - 
+    # index.mjs file code below
+    
+    import express from "express";
+
+    const app = express()
+
+    app.get("/", (req,res)=>{
+    res.send("<h1>WELCOME TO THE NODE APP</h1>")
+    })
+
+    app.get("/about", (req,res)=>{
+        res.send("<h1>WELCOME TO THE about</h1>")
+    })
+
+    app.listen(3000); # the port we have to use with localhost
+  
+  - save the file as .mjs --> because we imported a module so need to be saved as modular file
+  - node index.mjs --> to run the file
+
+  - see the docker file
+    - here we are making custom image and then will make a container to run the index file whenever we will make the container
+    - 
+      # content of the dockerfile
+
+      FROM node
+
+      WORKDIR /myapp # this is the directory we made for the node app
+
+      COPY ./package.json . # copy <source> <destination>
+
+      RUN npm install # to install the dependencies from package.json
+
+      COPY index.mjs . # the dot at last shows the destination, here /myapp
+
+      EXPOSE 3000 # the port we want to open for communication
+
+      CMD ["node","index.mjs"] # the command to run "node index.mjs"
+
+  - steps
+    - sudo docker build .
+    - sudo docker run -p3000:3000 <image_id of custom image>
+    - sudo docker ps -a --> check the container
+    - now the index file will be running (because we mentioned it in dockerfile)
+    - ctrl+c, or stopping the container will stop the index.mjs file
+  - sudo docker stop <container_id> --> stops the container
+  - sudo docker start <container_id> --> starts the container
+    - to start the container in interactive mode as we did in image with -it, we use -i here
+    - to name a container 
+      - sudo docker run -it --name <container_name> <image_id>
+  - sudo docker rm <container_id> --> removes the container
+  - we can also make another container using different port as -p4000:3000, so this will run at 4000 and the previous one was running at 3000
+  - docker rmi <image_id> --> to remove image
+  - sudo docker images prune --> delete all the images
+  - docker run --name <container_name> -p <ports> -d <image_name> --> here it will not hold up the terminal, -d stands for detached mode
+    - attached mode is used to view the logs
+  - docker start --> t will be in detached mode from the start, use -a to use it in attached mode
+  - docker logs <container_name> --> gives the log generated by that container
+  - if we make any changes to the file, we have to build the image again
+    - not a new image is build, it is layered on the previous layer
+    - the main image is still the earlier one
+
+- python script
+  - Dockerfile --> Configuration file which defines the expected destinatino configuration
+  - Image --> compiled data fromt he configured file as a source for each development
+  - Container --> final box/container where the program will actually run on any host
+  - python file script
+
+    from random import randint
+
+    min = int(input('enter min number '))
+    max = int(input('enter max number '))
+
+    if min>=max:
+        print('ehhhh')
+    else:
+        random=randint(min,max)
+        print(random)
+  
+  - Dockerfile
+
+    FROM python
+
+    WORKDIR /myapp
+
+    COPY example.py .
+
+    CMD ["python3","example.py"]  
+
+- sharing the image created
+  - publishing the image using docker hub
+    - create a repository in dockerhub
+    - docker push <image_name> --> push the image to repo (use the image name as mentioned in dockerhub)
+    - docker login --> to login to dockerhub
+
+- getting inside the container 
+  - using container instead of hostOS
+  - sudo docker exec -it <container_name> bash --> open container in interactive mode
+  - sudo docker run -it --name <container_name> dakshinnovaccer/training_p360:1.0 bash
+    - the above command opens bash while creating the container
+  
+- sudo docker image inspect <image_name> --> show the detail of that image in json format
+- sudo docker info --> tells about the info of the docker
+- sudo docker cp <filename> <container_name>:/WORKDIR --> copies the local file from host to inside the container
+  - it can be other way around also
+- docker tag existing_image:tag newimage:tag  --> this way we dont need to build new image every time, just rename it this way
+
+- another nodejs
+  - npm init --yes
+  - npm install express
+  - write the node file
+  - node <filename> --> to start the node app
+  - sudo npm install -g nodemon --> used to not reload node everytime, it will reload whenever any change is done. -g stands for global, i.e. for all the users
+  
+  - to docker
+  - we need to give package.json, index.js (sourcecode), commands (like nodemon etc.), and expose our port to the destination server ports i.e. mapping
+  - CMD, run with container
+  - RUN, runs at tthe time of creating image
+  - Docerfile
+    FROM node
+
+    WORKDIR /app
+
+    COPY package.json .
+
+    RUN npm install
+
+    COPY index.js .
+
+    EXPOSE 3000 
+
+    CMD ["nodemon","index.js"]
+
+  - the above file not work, nodemoen doesn't work like that
+  - we have to go to package.json and add this line to Script
+    - "start":"nodemon index.js"
+  - now in the Docerfile do change the last line to
+    CMD ["npm", "index.js"]
+  - rebuild the app
+  - create container
+  - if you do any changes to index.js inside the container it will be reflected to the webpage also because of nodemon
+  - sudo docker build -t nodeapp:version .
+  - sudo docker run --name mynode nodeapp:version
+  - sudo docker exec -it mynode bash --> to go into the container
+  - Dockerfile
+    FROM node
+
+    WORKDIR /app
+
+    COPY package.json .
+
+    RUN npm install
+
+    COPY index.js .
+
+    EXPOSE 3005
+
+    CMD ["npm","start"]
+  
+  - index.js
+    const express = require("express")
+
+    const app = express()
+
+    app.get("/", (req,res)=>{
+        console.log("Index page logged in the logs")
+        res.send("<h1>WELCOME TO THE NODE JS APP</h1>")
+    })
+
+    app.get("/about", (req,res)=>{
+        console.log("About page logged in the logs")
+        res.send("<h1>About page</h1>")
+    })
+
+    app.listen(3005);
+
+  - app.listen(process.env.<variable_name>) --> to use the nv varibale of OS
+    - app.listen(process.env.MYPORT) --> to give the port no dynamically
+    - <important> sudo docker run --name mynode_new -p 8000:1000 -e MYPORT=1000 mynode:5.0
+      - the above command
+      - -e --> to devlare env vraiable MYPORT
+      - we can also add -rm to remove the container automaticallt once it is stopped
+    - index.ks file
+      const express = require("express")
+
+      const app = express()
+
+      app.get("/", (req,res)=>{
+          console.log("Index page logged in the logs")
+          res.send("<h1>WELCOME TO THE NODE JS APP</h1>")
+      })
+
+      app.get("/about", (req,res)=>{
+          console.log("About page logged in the logs")
+          res.send("<h1>About page</h1>")
+      })
+
+      app.listen(process.env.MYPORT);
+
+    - Dockerfile
+      FROM node
+
+      WORKDIR /app
+
+      COPY package.json .
+
+      RUN npm install
+
+      COPY index.js .
+
+      EXPOSE $MYPORT
+
+      CMD ["npm","start"]
+
+    - we can also provide myport value in dockerfile as 
+      - ENV MYPORT=<port>
+    - --rm flag --> removes the container as soon as container stops
+    
+- Docker Volume
+  - application data like index.js --> typical source code data
+    - it is typically stored in the image
+  - temporary data like cache files, user uplodaded images, assets etc.
+  - permanent storage like databse files OR called as persistent storage
+  - all the above data can be stored in a container, but if the container gets deleted, so does the data
+  
+  - types of volume
+    - anonymous volume
+      - declare in dockerfile using VOLUME
+      - this type of volume removes on removal of container
+      - to use it in a flag with -v, we have to give the destination path only
+    - named volume
+      - -v assets:/app/assests --> creates a volume, use it at the time of creating the container (docker run command)
+        - here we gave the name assets before :, so this is a named volume
+        - the assets folder will be created on the host machine
+      - this type of volume doesn't gets deleted on deletion of container
+      - 
+    - bind mounts
+      - a application is that it allows to also modify the source code, no need to build the image again
+      - -v ${pwd}:/app --> giving the path as well as the destination
+      - one way traffic, changes made to host will reflect in container too
+      - changes made in container not reflects in the host machine
+      - so we can say that builidng bind mount volumes helps us to not rebuild images again and again
+
+    
+
+  - CREATING A FILE MANAGEMENT APP IN NODE JS
+    - docker run --name fm 
+      -v assests:/app/assets
+      -v $(pwd):/app    # $(pwd) --> gives the path of the current working directory
+      -v /app/node_modules/
+      -d -p 3000:3000 filemanager:version
+    
+    - we need to made to anonymous volume because 
+      - we made named volume to get the assets folder, so that we can access it by our browser also, i.e in container too
+      - then we linked the whole folder to the /app, i.e. to the container
+      - the problem is that we did npm install in Dockerfile, it got installed too
+      - then when we did the bind mount and what bind mount does is it override the whole folder to app folder
+        - it doesnt just merge, but the whole
+        - and as we deleted the whole node_modules from our host machine as we do npm install on docker so we delete to avoid redundancy and space conflict
+        - so the node_module is not in the /app now, because of it we will get various errors
+      - we added anonymous image to get the node_module out of the container
+
+      - now what is the preference in which this happens is, if other volume has larger path lenght than the bind mount
+        then the volumes are exempted and gets merge with bind mount upon execution
+          i.e. any folder which is either named or anon. volume will be exempted
+      - when we run the commmand with bind mount, there will be a node module made
+      - when we delete the container the node module made at host machine will also get deleted, because it is an anonymous volume
+
+    - index.js
+      
+      const express= require("express")
+      const exists = require ("fs")
+      const bodyParser = require ("body-parser")
+      const path = require("path")
+      const fs = require ("fs").promises
+
+      const app = express()
+
+      app.use("/assets", express.static("assets"))
+
+      app.get("/", (req,res) =>{
+          res.send("<h1>WELCOME TO THE NODE APP</h1>")
+      });
+
+      app.get("/create", async (req,res) => {
+          let filename = req.query.filename;
+          let content = req.query.content;
+          const fullpath = path.join(
+              __dirname,
+              "assets",
+              filename.toLocaleLowerCase() + ".txt"
+          );
+          console.log(`file is ${fullpath} and content ${content}`)
+          await fs.writeFile(fullpath, content)
+          res.send("<H1>FILE CREATED SUCCESSFULLY</H1>")
+      })
+
+      app.listen(3000)
+    
+    - Dockerfile
+      FROM node
+
+      WORKDIR /app
+
+      COPY package.json .
+
+      RUN npm install
+
+      COPY . .
+
+      EXPOSE 3000
+
+      CMD ["npm", "start"]
+
+    - package.json
+      
+      {
+        "name": "NodeFileManger",
+        "version": "1.0.0",
+        "main": "index.js",
+        "scripts": {
+          "test": "echo \"Error: no test specified\" && exit 1",
+          "start": "nodemon index.js"
+        },
+        "keywords": [],
+        "author": "",
+        "license": "ISC",
+        "description": "",
+        "dependencies": {
+          "body-parser": "^1.19.2",
+          "express": "^4.17.3",
+          "fs": "^0.0.1-security",
+          "nodemon": "^2.0.15",
+          "path": "^0.12.7"
+        }
+      }
+  
+    - as we delete the node_modules, and package-lock , we can list them in 
+      .dockerignore and they will be ignored
+
+- mongo and Node app
+  - create a NETWORK using 
+    - sudo docker network create mynetwork
+  - create mongodb container
+    - sudo docker run -p 27017:27017 --name mongo --network mynetwork -d mongo
+  - build the image of node app
+    - index.js
+
+      const express = require("express")
+      const mongoose = require("mongoose")
+      const app = express();
+
+      app.get("/" , (req,res) => {
+          res.send("<h1>Hi there welkcome to node app</h1>")
+      })
+
+      mongoose.connect(
+          "mongodb://mongo:27017/innovaccer",
+          { useNewUrlParser :true},
+          (err) =>{
+              if(err){
+                  console.log("===connection NOT established");
+                  console.log(err);
+              } else{
+                  console.log("====connection established");
+                  app.listen(3000);
+              }
+          }
+      )
+
+    - create a container of the above Node app
+      - sudo docker -p 3000:3000 --name nodemongo --network mynetwork nodemongo:1.0
+    
+    - things to notice
+      - use of docker network --> as the mongo and node are not in same continer so there was no way to make them run together, so we made some changes in index.js file as     "mongodb://mongo:27017/innovaccer"
+      - here we wrote mongo:27017, instead on mongo we could have written the IP of the mongo  container that we made on the network, but the ip can change due to somethings so we use the name of the container
+      - on the network node and mongo are linked together, so they can be on different machines yet they will work fine because of the IP
+      - here as of now, the network, mongo and nodeapp should be on same machine
+      - follow the above steps as it is, no change should be there in order of execution
+
+    - docker network create <network_name> --> creates network with name <network_name>
+    - docker network ls --> lists all the network
+
+
+- Docker Compose :(will discuss later as of 8th march)
+  https://docs.docker.com/compose/compose-file/compose-file-v3/ 
+
+  

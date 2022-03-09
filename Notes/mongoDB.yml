@@ -1,0 +1,48 @@
+- MongoDB 
+- Installation 
+- https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/ 
+- Studio3T 
+- Robo3T 
+- CRUD 
+- db.RecordsDB.insertOne({ 
+name: "Marsh", 
+age: "6 years", 
+species: "Dog", 
+ownerAddress: "380 W. Fir Ave", 
+chipped: true 
+}) 
+
+
+- db.RecordsDB.insertMany([{ name: "Marsh", age: "6 years", species: "Dog", 
+ownerAddress: "380 W. Fir Ave", chipped: true}, {name: "Kitana", age: "4 years", 
+species: "Cat", ownerAddress: "521 E. Cortland", chipped: true}]) 
+{ 
+"acknowledged" : true, 
+"insertedIds" : [ 
+ObjectId("5fd98ea9ce6e8850d88270b4"), 
+ObjectId("5fd98ea9ce6e8850d88270b5") 
+] 
+} 
+
+- db.RecordsDB.find() 
+- db.RecordsDB.find( { status: "A" }, { item: 1, status: 1 } ) --> Specific fields 
+- db.inventory.find( { status: "A" }, { item: 1, status: 1, _id: 0 } ) --> ignore _id 
+- db.inventory.find( { status: "A" }, { status: 0, instock: 0 } ) --> return all but these fields 
+- db.RecordsDB.find({"species":"Cat"}) 
+- db.RecordsDB.findOne({"age":"8 years"}) 
+- db.RecordsDB.updateOne({name: "Marsh"}, {$set:{ownerAddress: "451 W. Coffee St. A204"}}) 
+- db.RecordsDB.updateMany({species:"Dog"}, {$set: {age: "5"}}) 
+- db.RecordsDB.replaceOne({name: "Kevin"}, {name: "Maki"}) 
+- db.RecordsDB.deleteOne({name:"Maki"}) 
+- db.RecordsDB.deleteMany({species:"Dog"}) 
+- db.RecordsDB.count() 
+- db.RecordsDB.find().limit(10)
+
+- db.RecordsDB.find({likes: {$gt: 1}}) 
+- db.RecordsDB.find({likes: {$lt: 1}}) 
+- db.post.find({likes: {$ne: 1}}) 
+- db.post.find({likes: {$eq: 1}}) 
+- db.user.find().sort({age: 1}) 
+- db.user.find( { $and: [ { price: { $ne: 1.99 } }, { price: { $exists: true } } ] } ) 
+- db.inventory.find( { $or: [ { quantity: { $lt: 20 } }, { price: 10 } ] } ) 
+- db.inventory.find ( { quantity: { $in: [20, 50] } } )
