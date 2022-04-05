@@ -487,4 +487,54 @@
 - Docker Compose :(will discuss later as of 8th march)
   https://docs.docker.com/compose/compose-file/compose-file-v3/ 
 
+- create a new jenins instance
+  - sudo docker run --name myjenkins -d -v jenkins_home:/var/jenkins_home -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts-jdk11
+  - sudo docker logs myjenkins --> gives the password
+
+- jenkin with nodejs
+  - create index js
+  - creat docker
+  - link to a new github
+  - create a jenkins container on cloud
+  - login to jenkin dashboard
+  - go to manage jenkins -> modify plugins -> search for nodejs -> download and install after restart
+  - go to manage jenkins -> global tool config -> add nodejs -> provide a name
+  - create a new job with freestyle and description
+  - give the git repo under source code management
+  - under BUILD, enter npm install (here is just to check if nodjs is downloaded)
+  - under build environment, tick the node checkbox
+  - once ready, select build now on left side
+  - the job can be seen inside the myjenkin container too inside the var/jenkins_home/workspace/<app_name>
+  - now we dont need the node_module as it will be done in the dockerfile, so remove the nopm install app from the build section
+  - docker is on host machine not in the container, so we need to install it too as we did with nodejs -> name is cloudbees docker
+  - create a docker instance from manage jenkins -> global tool management --> docker -> add dofker -> provide name
+  - create a docker hub repo
+  - add a build step -> docker build and publish -> provide the repo name of the docker hub
+  - go to advance in build -> docker installation -> choose docker instance -> save
+  - THIS WILL FAIL (the docker plugin part), AS DOCKER ISN'T INSIDE THE CONTAINER
+  - ALTERNATE SOLUTION
+  - build new image from jenkins as base and install docker from shell, we are working with docker sock basically
+  - build using --> docker build -t jenkins_custom:1.0 .
+  - the docker file for the above image
+  
+    FROM jenkins/jenkins:lts-jdk11
+    USER root
+
+    RUN mkdir -p /tmp/download && \
+    curl -L https://download.docker.com/linux/static/stable/x86_64/docker-18.03.1-ce.tgz | tar -xz -C /tmp/download && \
+    rm -rf /tmp/download/docker/dockerd && \
+    mv /tmp/download/docker/docker* /usr/local/bin/ && \
+    rm -rf /tmp/download && \
+    groupadd -g 999 docker && \
+    usermod -aG staff,docker jenkins
+
+    USER jenkins 
+
+  - we have a script (dockerfile), which will install docker in the container when executed
+    - we will run ->
+        - sudo docker run --name myjenkins -d -v jenkins_home:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock -p 8080:8080 -p 50000:50000 jenkins_custom:1.0
+          - here the var/run/ ...volume is connecting the host docker to the docker in container
+  - the above steps will be done after stopping the earlier jenkins container
+  - now as we run localhost:8080, we will still get the same dashboard, because of the named volume jenkins_home
+
   

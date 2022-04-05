@@ -1,0 +1,47 @@
+    1.Select the section with an id of container without using querySelector. 
+    2.Select the section with an id of container using querySelector. 
+    3.Select all of the list items with a class of "second". 
+4.Select a list item with a class of third, but only the list item inside of the ol tag. 
+5.Give the section with an id of container the text "Hello!". 
+6.Add the class main to the div with a class of footer. 
+7.Remove the class main on the div with a class of footer. 
+    8.Create a new li element. 
+    9.Give the li the text "four". 
+    10.Append the li to the ul element. 
+    11.Loop over all of the lis inside the ol tag and give them a background color of "green". 
+12.Remove the div with a class of footer. 
+
+
+create array of objects - 5 objects: 
+firstName:pooja 
+lastName 
+number: 
+liskes:[] 
+degrees write a fucntion to find a contact input params: firstname , property based on the firstname 
+search if property exists fucntion(pooja, likes) 
+
+
+create a table 
+<tr> 
+<td></td> 
+<td></td> 
+</tr> 
+<tr> 
+<td></td> 
+<td></td> 
+</tr> 
+function to insert new row to table 
+add 2 cells 
+call on button click 
+insertCell 
+
+
+
+
+
+1.create a array with multiple objects named employee 
+2.each object will have id,(unique) ,name, age,designation,salary,phone 
+3.Filter all developer, 
+4.age below 30, 
+5.age below 30 and earn above 70K, 
+6.designation accountant and salary below 40K 

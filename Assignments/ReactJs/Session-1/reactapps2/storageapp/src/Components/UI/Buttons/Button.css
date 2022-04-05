@@ -1,0 +1,16 @@
+.button{
+    font: inherit;
+    background-color: blueviolet;
+    color: antiquewhite;
+    border: 1px solid blueviolet;
+    padding: 0.75rem 3rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+.button:disabled{
+    background-color: #ccc;
+    border-color: #ccc;
+    color: darkgray;
+    cursor: not-allowed;
+}

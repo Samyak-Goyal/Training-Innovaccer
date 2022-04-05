@@ -1,0 +1,7 @@
+FROM node
+
+WORKDIR /myapp
+
+COPY . .
+
+CMD ["node", "index.js"]
