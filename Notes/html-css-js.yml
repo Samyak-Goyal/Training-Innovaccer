@@ -1,0 +1,1286 @@
+- HTML
+  - header and footer tag
+  - rowspan colspan
+  - audio tag controls type
+  - video tag controls
+  - anchor tag
+  - img tag
+  - BETTER take a look at html help websites like w3schools, MDN (Mozilla documentation) and practice
+  - assignment:- make registration form
+
+
+
+
+
+
+
+
+
+
+
+- JavaScript
+  - console.log --> prints the output to the console
+  - diff between var and let (scope) --> var has no scope, let has local scope.
+  - loops --> same as in java/cpp
+  - escape characters (\") --> to print a character which is inside the string
+    - 'Ram's laptop' --> here the ' before s makes the string end there but we want to print Ram's Laptop
+    - so we do 'Ram\'s Laptop' --> it will print Ram's Laptop
+  - template literals --> writing string inside backticks(`)
+    - we can use it like ->
+      - var a = 10;
+        console.log(`the value of a is ${a}`) --> prints, the value of a is 10
+      - ${..} --> is called interpolation
+      - we can also perform various fucntion inside ${}
+      - we can also print `Ram's Laptop`, no need of escape character
+  - arrays in js
+    - var arr = ["daksh",1 , true] --> can contain elements with diff data types
+    - .pop() --> rmeoves element from the last
+    - 2d arrays
+    - indexing from 0
+    - .shift() -> removes from start
+    - .unshift() -> adding at the start (not replacing)
+    - .push() --> adds to the last index
+    - .length() --> check the length of the array
+  - tight language, diff datatype for same variable
+    - var myage = "18" --> here the myage type is string
+      myage = 18 --> here the type of the above same myage changes to number by itself
+  - functions
+    - lambda function
+      -
+        var myfunction = function(a){
+          console.log(`value of a is ${a});
+        }
+        myfunction(44)
+    - arrow function
+      -
+        let myfunc = (val) => "Value is :" + val
+        console.log(myfunc(10))
+
+        --> gives output:- Value is 10
+
+  - differnece between == and ===
+    - == checks the value only
+    - === checks the datatype too
+  - !== --> not equal value and not equal type
+  - != --> not equal value
+  - ternary operator
+  - Math.random() --> gives random number
+  - this keyword --> refrences to the current object executing the function
+  - classes
+    - class Student{
+          fullname= "Daksh Bindal";
+
+          printname(){
+              this.fullname
+          }
+      }
+
+    - get and set in class
+        class Rectangle {
+            constructor() {
+                console.log("class is created")
+                this.width = 5
+                this.height = 10
+            }
+            getArea() {
+                return this.width * this.height
+            }
+            get area() {
+                return this.width * this.height
+            }
+            set area(a) {
+                this.width = a
+            }
+        }
+
+        let rect2 = new Rectangle()
+        rect2.area = 10
+        console.log(rect2.area)
+    
+    - static function/variable (private variables)
+        static hello(){
+            console.log("helloooo")
+        }
+
+        they can be accessed throuhg classname only, not throuhgt object
+        so <Class_name>.hello() , will work
+    
+  - objects
+    - 
+      const user = {
+          fullname: "Daksh Bindal",
+          myage: 20,
+          teach: function(){
+              console.log(this)
+          }
+      }
+
+      user.teach()
+
+      --> "this" in teach function returns the parent of the current function, i.e. the user object which is the parent of teach function
+    - const anotherinstance= user.teach;
+      --> in above line teach function is detached to anotherinstance
+    - anotherinstance(); --> here the parent is not user, so it will print window object, which is actually the root object (beacuse there is "this" statment in the functino defination)
+  - array of objects
+  - .filter()
+    const task =[
+        {
+            id: 1,
+            title: "task1",
+            status: "in progress"
+        },
+        {
+            id: 2,
+            title: "task1",
+            status: "completed"
+        },
+        {
+            id: 3,
+            title: "task1",
+            status: "completed"
+        },
+        {
+            id: 4,
+            title: "task1",
+            status: "in progress"
+        },
+    ]
+
+    const completedTask = task.filter((currentTask) => currentTask.status==="completed")
+
+    console.log(completedTask)
+  - 
+    const newuser = {
+        fullname :"Daksh Bindal",
+        age: 20,
+        discuss(){
+            setTimeout(function(){
+                console.log("This keyword",this);
+            } ,3000)
+
+        }
+    }
+
+    newuser.discuss()
+
+    --> there will be delay and then it will output window, not newuser. beacuase parent of settimeout is window not newuser
+        this is because in case of traditional functions like function(), the do unbinding to the parent of current function
+
+        const newuser2 = {
+            fullname :"Daksh Bindal",
+            age: 20,
+            discuss(){
+                setTimeout(() => {
+                    console.log("This keyword in arrow function",this);
+                } ,3000)
+
+            }
+        }
+
+        newuser2.discuss()
+    --> if we used arrow function instead of arrow fucntion, there is no unbinding process and gives the output of 'this' as newuser, not window
+    BECAUSE of no unbinding, arrow funcitons are super fast
+  - .map() function --> allows us to edit the value
+  - destructuring
+
+    const address= {
+        street: "streetname",
+        city: "cityname",
+        state: "statename",
+        country: "countryname"
+    }
+
+    const {street, city, state, country} = address; #extracts the value from the address
+    # also creates local variable
+    console.log(`${street} ${city} ${state} ${country}`)
+    const { x: a, y: b, z: c } = object_name --> if we want to change the name, a will be alias for key x in the object and so on
+    --> we can use destructuring for parameters also, say we pass object with key values like a, b...
+        now we in function arguments we write func({a}), by this only a will be accessed in the function
+
+  - spread operator
+    const arr1 =[1,2,3]
+    const arr2 =[5,6,7]
+
+    const finalarray = arr1.concat(arr2) # helps to concate two arrays into one
+    console.log(finalarray) 
+
+    const finalarray2 = [...arr1, ...arr2]; # spread operator
+
+    console.log(finalarray2)
+
+    --> the difference between concat and spread is that in spread we can inject values in between like
+    [..arr1, 4, ..arr2] --> 1,2,3,4,5,6,7
+
+    --> they are not limited to array only, they can be applied to objects also
+
+    const firstname = {firstname: "daksh"}
+    const lastname = {lastname: "bindal"}
+
+    const fullname = { ...firstname, middlename: "sanjeev", ...lastname}
+    # middlename is injected, but it should be of the same format if not same type
+    console.log(fullname)
+
+    --> using spread operator to omit some values
+      const arr10 = [1,2,3,4,5,6]
+
+      const[ , , ...arr12] = arr10;
+      console.log(arr12)
+
+      here in arr12 will skip the first 2 values (because 2 commas are there) and rest will be copied
+
+    --> another example
+      const obj = {fullname: "daksh", age: 10, number: 10}
+
+      const { age, ...obj1} = obj
+      console.log(obj1) 
+
+      -- here the obj1 contains fullname and number, age is not in obj1
+        so we can use spread operator to omit out some values from our selection too
+
+  - typeof null --> object, so the typeof any null is 'object'
+  - strings are immutable, i.e. a single letter from them cant be changed
+  
+  - objects (extended)
+    - var person ={
+          name: 'daksh',
+          age: 20,
+          lastname: 'bindal'
+      }
+
+      console.log(person['name'])
+
+      --> we can access the keys through
+        --> person.name OR person['name']
+          - the diff is that when we have numbers or multiple words (spaces in b/w) as keys then we cant use the (.) format,
+            we have to use the bracket format in that case
+      
+    - we can add any key by just, person.address = 'xyz' --> this adds the key address in the object
+    - delete person.address --> to delete that key
+
+    - hasOwnProperty --> checks whether the object has certain key or not
+      var myobj = {
+          gift: 'a',
+          paper: 'news',
+          stone: 'rock'
+      }
+
+      function checkObj(checkprop){
+          return myobj.hasOwnProperty(checkprop)
+      }
+
+      console.log(checkObj("rock"))
+
+    - array of objects
+      var obj = [
+          {
+              name: 'daksh',
+              lastname: 'bindal',
+              learns: ["aws", "js"]
+          },
+          {
+              name: 'daksh',
+              lastname: 'bindal',
+              learns: ["aws", "js"]
+          }
+      ]
+
+      console.log(obj)
+
+    - nested object --> objects withing object, any key is a object, i.e. hold multiple values inside
+    - Object.freeze(<object_name>) --> to make object immutable
+      function testObj() {
+        const mathobject = {
+                pi: '3.14'
+            }
+            Object.freeze(mathobject)
+            // mathobject.pi = '10'
+            // var value = 3 * mathobject.pi
+            try {
+                mathobject.pi="10"
+            } catch (err) {
+                console.log(err)
+            }
+            return mathobject.pi
+      }
+
+      console.log(testObj())
+
+  - ternary operators (? :) (if else)
+
+  - higher order functions
+    - .filter
+
+      const realnum = [4, 5, 6, -9, 0.6, 10, -2, 10.2];
+
+      const list = (realnum) => {
+          const numbers = realnum.filter((num) => Number.isInteger(num) && num > 0)
+          return numbers;
+      }
+
+      console.log(list(realnum))
+    
+      --> in the filter function, it checks if num (each element from the array 'realnum') is integer and is >0, if yes, it will return that number
+      --> as list is taking realnum, so it will return an array
+    - .reduce --> reduces to a single element
+      const sum = (x, y, z) => {
+          const args = [x, y, z];
+          return args.reduce((a, b) => a + b, 0)
+      }
+
+      console.log(sum(1, 2, 3));
+      --> the output of the above code is 6
+      --> (a,b), here the function does a+b and the initial value of a is '0' (from (a+b, 0))
+          b is each element from the array 'args'
+          by default a takes '0' as intial value
+      --> the above function is essentially doing sum of whole array
+    
+    - find --> same as filter the diff is that is stops as soon as it gets the first value
+      var arr= [1,2,3,4]
+      arr.find((n)=>n-=2)
+
+    - rest --> takes n number of arguments and converts it into an array
+      const sum = (...args) => {
+          return args.reduce((a, b) => a + b)
+      }
+
+      console.log(sum(1, 2, 3, 4, 5, 6, 7));
+
+      --> here we dont need to update the no of parameter if we change the no of arguments while calling the function
+        ...args --> convert the arguments to an array by itself (... is the rest operator)
+    
+    - spread --> discussed above
+
+  - DOM --> document object model
+    - allows to access all the object with their styles and content on our webpage
+
+    - getElementByID --> getting the element with id "para" (in the html <p> tag had id as para)
+      const myElement= document.getElementById("para")
+      console.log(myElement) 
+
+      - .innerHTML --> adds/changes HTML content inside that element
+          const myElement= document.getElementById("para").innerHTML="Hello world"
+    
+      - adding CSS style to the <p> tag
+          document.getElementById("para").innerHTML = "Hello world"
+          const myElement = document.getElementById("para")
+          myElement.style.color = "red"
+          console.log(myElement)
+      
+    - getElementsByClassName 
+      const collection = document.getElementsByClassName('newdiv')
+      collection[0].innerHTML = "Hellooooo"
+      console.log(collection)
+
+      --> in the html we made 2 div tags with class as newdiv
+
+      - style in js
+
+        const collection = document.getElementsByClassName('test demo');
+        collection[0].style.background = "red"
+
+        HTML file is:
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+            <style>
+                div{
+                    border: 1px solid black;
+                    padding: 8px;
+                    margin-top: 2px;
+                }
+            </style>
+        </head>
+
+        <body>
+            <h1>advance Javascript demo</h1>
+            <!-- <p id="para"></p> -->
+            <!-- <div class="newdiv"></div>
+            <div class="newdiv invalid"></div> -->
+            <div class="test">
+                <p>This is for 1st div</p>
+            </div>
+            <div class="test demo">
+                <p>This is for 2nd div</p>
+            </div>
+            <div class="test demo">
+                <p>This is for 3rd div</p>
+            </div>
+            <script src="./script.js">
+            </script>
+        </body>
+
+        </html>
+
+        --> there is some style already in the HTML, but we are adding more to it
+
+    - getElementsByName
+      let collection = document.getElementsByName('fname')
+      document.getElementById('tagname').innerHTML = collection[0].tagName
+
+      html:
+      <body>
+          <h1>advance Javascript demo</h1>
+          <!-- <p id="para"></p> -->
+          <!-- <div class="newdiv"></div>
+          <div class="newdiv invalid"></div> -->
+          <!-- <div class="test">
+              <p>This is for 1st div</p>
+          </div>
+          <div class="test demo">
+              <p>This is for 2nd div</p>
+          </div>
+          <div class="test demo">
+              <p>This is for 3rd div</p>
+          </div> -->
+          <p> First name: <input type="text" name="fname" value="daksh"></p>
+          <p>First name: <input type="text" name="fname" value="bindal"></p>
+          <p id="tagname"></p>
+          <script src="./script.js">
+          </script>
+      </body>
+
+      - if we want to check the checkboxes
+        let num = document.getElementsByName('animal')
+        for (let i = 0; i < num.length; i++) {
+            if(num[i].type=='checkbox') num[i].checked=true
+        }
+
+        html:
+        cats: <input type="checkbox" name="animal" value="cats" />
+        dogs: <input type="checkbox" name="animal" value="dogs" />
+        <p id="tagname"></p>
+        <script src="./script.js">
+        </script>
+    
+    - getElementsByTagName
+      const collection = document.getElementsByTagName('li')
+      console.log(collection)
+      document.getElementById('test').innerHTML = collection[1].innerHTML
+
+      html-->
+      <ul>
+          <li>cat</li>
+          <li>dog</li>
+          <li>frog</li>
+
+      </ul>
+      <p id="test"></p>
+
+      --> here we will be getting the list and line with innerhtml fills the paragraph with the content of collection[1] html
+          i.e. dog
+      
+      - listing all the tags
+        const collection = document.getElementsByTagName('*')
+        let test=''
+        for (let i = 0; i < collection.length; i++) {
+            test+=collection[i].tagName +"<br>"
+        }
+        document.getElementById('test').innerHTML=test
+
+    - createElement
+      const para = document.createElement('p'); # addign p tag
+      para.innerText = "this is para" #adding text to the para tag
+      document.body.appendChild(para) # .body is the <body> and .appenchild is used to append a tag
+
+    - createAttribute
+      function newfunction(){
+        // const attr = document.createAttribute('class')
+        // attr.value="paraclass" #add paraclass to css in the html too 
+        # use this in setAttribute Node
+        #add this to p
+        document.getElementsByTagName('p')[0].setAttribute("class","paraclass") #first argument is the attribute name and the second is the value of that attribute
+      }
+
+      html: 
+      <!DOCTYPE html>
+      <html lang="en">
+
+      <head>
+          <meta charset="UTF-8">
+          <meta http-equiv="X-UA-Compatible" content="IE=edge">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Document</title>
+          <style>
+              div {
+                  border: 1px solid black;
+                  padding: 8px;
+                  margin: 2px 2px;
+              }
+              .paraclass{
+                  color: green;
+              }
+          </style>
+      </head>
+
+      <body>
+          <h1>advance Javascript demo</h1>
+          <!-- <p id="para"></p> -->
+          <!-- <div class="newdiv"></div>
+          <div class="newdiv invalid"></div> -->
+          <!-- <div class="test">
+              <p>This is for 1st div</p>
+          </div>
+          <div class="test demo">
+              <p>This is for 2nd div</p>
+          </div>
+          <div class="test demo">
+              <p>This is for 3rd div</p>
+          </div> -->
+          <!-- <p> First name: <input type="text" name="fname" value="daksh"></p>
+          <p>First name: <input type="text" name="fname" value="bindal"></p>
+          <p id="tagname"></p> -->
+
+          <!-- cats: <input type="checkbox" name="animal" value="cats" />
+          dogs: <input type="checkbox" name="animal" value="dogs" />
+          <p id="tagname"></p> -->
+
+          <!-- <ul>
+              <li>cat</li>
+              <li>dog</li>
+              <li>frog</li>
+
+          </ul>
+          <p id="test"></p> -->
+
+          <!-- <p>1st para</p>
+          <p>2st para</p>
+          <p>3st para</p> -->
+
+          <!-- <div id="mydiv"> 
+              <h3>this is div</h3>
+          </div> -->
+
+          <p>This is a para to add attributes</p> #here the attribute will be added
+          <button onclick="newfunction()">ADD</button> # onclicking the button, we will get the changes to the paragraph
+          <script src="./script.js">
+          </script>
+      </body>
+
+      </html>
+
+      --> setAttribute allows to add attribute to pre created tag
+    
+    - querySelector --> only applies to the first element it finds
+      - document.querySelector('p').style.background ="yellow"
+
+        --> colors the background yellow of the first p tag it encounters
+        --> instead of p we can also use classname like (.class_name) (mind the dot(.))
+        --> if we user id instead of class or tagname, we use: # id_name , mind the "#"
+      
+      - function newfunction() {
+            var element = document.querySelector("div > p")
+            element.style.background = "green"
+        }
+        html
+        <div>
+            <h3>h3 tag</h3>
+            <p>first div first para</p>
+        </div>
+
+        <div>
+            <h3>2nd div</h3>
+            <p>second div</p>
+        </div>
+        <button onclick="newfunction()">click!</button>
+
+      - querySelector("a[target]") --> applies to the attribute "target" of tag "a"
+      - querySelector("h1,div,p") --> applies to the first tag it encounters out of h1,div and p
+    
+    - querySelectorAll
+
+      const collection= document.querySelectorAll(".test")
+
+      for (let index = 0; index < collection.length; index++) {
+          collection[index].style.background="green";
+          
+      }
+
+      --> it applies to all the elements with class value as test
+      --> same can be done with tagname, id etc
+    
+    - example of append
+
+      let app = document.querySelector('#app')
+      let langs = ['HTML', 'JS', 'CSS']
+
+      let element=langs.map((lang)=>{
+          let li= document.createElement('li')
+          li.innerHTML=lang
+          return li
+      })
+
+      app.append(...element)
+
+      html:
+      <ul  id="app">
+          <li>hello</li>
+      </ul>
+
+      --> the output will be the langs will be listed as li
+
+    - example of prepend
+      - same example as above, just the list are entered before 'hello'
+    
+    - innerHTML, innerText, textcontent
+      - innerhtml --> gives everything inside, the text, the tags, the spaces etc
+      - innertext --> gives the text only, no tags, no extra spaces etc
+      - textcontent --> gives the text, no tags but includes the extra spaces if there are any
+    
+    - removeAttribute --> to remove any attribute
+      - find the tag using getElement or querySelector and then remove the attribute you want to remove
+    
+  - Event Handling
+    - function alertmsg() {
+          alert("Button is clicked")
+      }
+      document.getElementById("clickme").onclick = alertmsg;
+
+      html:
+      <button id="clickme"> Click!</button>
+
+      on clicking it shows the alert
+
+      we can also use addEventListner('click',alertmsg)
+
+    - function getformval()
+     {
+          var x = document.getElementById("form1")
+          for (var i = 0; i < x.length; i++) {
+              if (x.elements[i].value != "submit") {
+                  x.elements[i].value = "new"
+                  console.log(x.elements[i].value)
+              }
+          }
+      }
+      let form = document.querySelector("#form1")
+      form.addEventListener("click", getformval)
+
+      function removecolor(){
+          var color= document.getElementById('colorselect')
+          color.remove(color.selectedIndex)
+      }
+      document.querySelector('#remove').addEventListener("click",removecolor) # clicking on this will remove the color from the dropdown menu that we created in the HTML file below
+
+      html:
+
+      <form id="form1">
+          First Name: <input type="text" name="fname" value="Daksh" />
+          <br>
+          Last Name: <input type="text" name="fname" value="Bindal" />
+          <input type="submit" name="submit" value="submit" />
+      </form>
+
+      <select  id="colorselect">
+          <option value="red">red</option>
+          <option value="green">green</option>
+          <option value="blue">blue</option>        
+      </select>
+      <!-- <button id="remove">Click here!</button> --> # does same function as the below line
+      <input type="button"  id="remove" value="click to remove">
+    
+    - classlist
+      function myFunction(){
+          var element= document.getElementById('mydiv')
+          element.classList.add("divstyle")
+      } # add class to the element with the mentioned id
+
+      CSS: 
+      .divstyle{
+          width:100%;
+          background-color: salmon;
+          padding: 1rem;
+          color: white;
+      }
+
+      html:
+      <p>this is a para</p>
+      <button onclick="myFunction()">Click! </button>
+      <div id="mydiv">
+          this is div element
+      </div>
+    
+      - remove the class using --> classList.remove("divstyle") # if mentioned as attribute in the tag already
+    
+    - function myFunction(){
+          var element= document.getElementById('mydiv')
+          element.classList.toggle("divstyle")
+      }
+
+      --> toggle --> we can remvoe and add the classlist by clicking the button
+    
+    - keydown event
+      let keyboard = document.querySelector("#keyboard")
+      keyboard.addEventListener("keydown",(event) =>{
+          console.log(event)
+      })
+
+      html:
+      <input type="text" id="keyboard">
+
+      --> as long as we type inside the input box, in the console there will be an output
+    
+    - keyup
+      --> also event as like keydown, but it will print on console only when key is released
+
+    - keypress
+      --> only prints when there is some alphanumerics involve, not prints when backspace, arrow key etc are used
+    
+    - we want to alert when a user presses any key that we dont want
+
+      let keyboard = document.querySelector("#keyboard")
+      keyboard.addEventListener("keydown",(event) =>{
+          console.log(event)
+          if(event.key == "@")alert("Key not allowed")
+      })
+      --> but it only gives an alert but still adds @ in the input box
+
+    - to prevent from adding
+      let keyboard = document.querySelector("#keyboard")
+      keyboard.addEventListener("keydown", (event) => {
+          console.log(event)
+          if (event.key == "@") {
+              alert("Key not allowed")
+              event.preventDefault()
+          }
+      })
+
+      --> event prevent default does the work here
+
+    - mouse double click event
+      const card = document.querySelector('aside')
+      card.addEventListener('dblclick', (event) => {
+          console.log(event)
+          card.classList.toggle('large');
+      })
+
+      CSS: 
+      aside{
+          background-color: aquamarine;
+          border-radius: 5px;
+          display: inline-block;
+          transform: scale();
+          padding: 1rem;
+          transform-origin: 0 0;
+          transition: transform 0.6s;
+          user-select: none;
+      }
+      .large{
+          transform: scale(1.3);
+      }
+
+      html: 
+      <aside> # semantic tag, doesn't change anything, just for screen readability (As well as user readability)
+          <h3>My card</h3>
+          <p id="p1">Double click to resize</p>
+      </aside>
+
+      --> on double clicking the content on the webpage, there the css will be applied
+    
+    - mouseup and mousedown
+      const card = document.querySelector('aside')
+      card.addEventListener('mousedown', (event) => {
+          console.log(event)
+          document.getElementById("para").style.color = "red"
+      })
+      console.log('File loaded')
+
+      html:
+      <aside>
+          <h3>My card</h3>
+          <p id="p1">Double click to resize</p>
+      </aside>
+
+      <div id="mydiv">Mouse up/down</div>
+      <p id="para">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi nihil voluptatem iure eius aliquid fuga sit laborum expedita illum id.
+      </p>
+      
+      --> will trigger the event on the click of mouse, works same as keyyup and keydown respectively
+    
+    - viewport --> the browser screen where we can do the changes and see them
+      used to see the user engagement (where they click the most)
+
+    - function logkey(event) {
+          screenlog.innerText = `
+          Screen X/Y : ${event.screenX} ${event.screenY}
+          Client X/Y : ${event.clientX} ${event.clientY}
+          Page X/Y : ${event.pageX} ${event.pageY}
+
+          `
+      }
+      let screenlog = document.querySelector("#screen-log")
+      document.addEventListener("mousemove", logkey)
+      html:
+      <p>Move Mouse to change data</p>
+      <p id="screen-log"></p>
+      --> here the logkey function will show the current x and y values of the screen, client and page
+    - creating a ul tag, add li items from the JS and do stylinh changes to it
+      const ul = document.createElement('ul')
+      document.body.appendChild(ul)
+      const li1 = document.createElement('li')
+      li1.innerText = "This is first li tag"
+      const li2 = document.createElement('li')
+      li2.innerText = "This is 2nd li tag"
+      ul.appendChild(li1)
+      ul.appendChild(li2)
+      function changeColor(event){
+          console.log(event.target)
+          event.target.style.color="red" #event target
+      }
+      ul.addEventListener("click",changeColor)
+      --> everything is done from JS only, no HTML changes were done
+    - const text = document.getElementById('nametext')
+      text.addEventListener('focus', () => {
+          text.style.background = "yellow"
+      }) #1 focus is when we click on the input box
+      text.addEventListener('blur', () => {
+          text.style.background = "red"
+      }) #2 blur is when we click outside the input box
+      const selecttext = document.getElementById('selectTest')
+      selecttext.addEventListener('change', (event) => {
+          console.log(event.target.value)
+      }) #3 change is used to change the value
+      const form1=document.getElementById('form1')
+      form1.addEventListener('submit', (event) =>{
+          console.log(event.target.elements)
+          event.preventDefault()
+      }) #4 prevent default prevents the default behavior of the browser
+      html:
+      <input type="text" id="nametext">
+      <select id="selectTest">
+          <option value="1">select</option>
+          <option value="2">checkbox</option>
+          <option value="3">RadioButton</option>
+      </select>
+      <form action="/action.php" method="post" id="form1">
+          <label for="name">first name</label>
+          <input type="text" name="name" id="first_name" required>        
+          <input type="submit" value="submit">
+      </form>
+    
+    - const timeIdentifier = setTimeout(() => {
+          console.log("This is timeout")
+      }, 500);
+      const intervalIdentifier = setInterval(() => {
+          console.log("this is interval")
+      }, 500); 
+      --> console is printed after every 500ms intervals
+ 
+      clearTimeout(timeIdentifier)
+      clearInterval(intervalIdentifier)
+    
+    - Scoping
+      - lexical --> inner function can access the variables declared in the outer function(s)
+                    and vice versa isn't true
+      - Closures --> using local variable to global (using functions)
+        -
+          function welcomeall() {
+              let welcome = "new message"
+              function sayhi() {
+                  console.log(welcome)
+              }
+              return sayhi
+          }
+          let hi = welcomeall()
+          hi()
+        - 
+          function myFunction(message) {
+              console.log(message)
+              return function (name) {
+                  return message + ' ' + name
+              }
+          }
+          let ret = myFunction("hello")
+          console.log(ret("daksh"))
+  
+  - Cosntructors
+    - name starts with capital letter
+    - can't modify the constructor 
+    -   
+      function Circle(radius) {
+          this.radius = radius;
+          this.draw = function () {
+              console.log("")
+          };
+      }
+      const circle3 = new Circle(12)
+  - references
+    -
+      let ob1 = { value: 10 }
+      let ob2 = ob1
+      ob1.value = 30
+      console.log(ob1, ob2)
+      
+      --> output will be {value:30}, got both
+      --> pointer concept
+      --> objects are passed by reference not by value
+  
+  - abstractions
+    - make variables and methods accessible or not accessible
+      function SecondCircle(radius) {
+          let color = 'red'
+      }
+      const circle5 = new SecondCircle(10)
+      console.log(circle5.color)
+      --> color wont be accessible, because it is variable and they have their own scope
+      --> so to make them unaccessible, declare variables and functions as variable (let)
+      --> but to make it accessible if we want to
+    
+      function SecondCircle(radius) {
+          let color = 'red'
+          this.radius = radius //globally available
+          let defaultLocation = { x: 20 } //not available
+          let computeLocation = function () {
+              //
+              console.log("in computeLocation")
+          }
+          this.draw = function () {
+              computeLocation();
+              console.log("Juat a method")
+              console.log(defaultLocation)
+          }
+          Object.defineProperty(this, 'defaultLocation', {
+              get: function () {
+                  console.log(defaultLocation)
+              },
+              set: function(num){
+                  defaultLocation= num
+              }
+          })
+      }
+      const circle5 = new SecondCircle(10)
+      circle5.defaultLocation #oputput {x:20}
+      circle5.defaultLocation = {x:60}
+      circle5.defaultLocation #output {x:60}
+      --> defaultLocation is not accessible
+      --> Object.defineProperty(<where is the property>, <what is the property>, {function}) is used to set get and set
+      --> get -> to read the value from outside also
+      --> set -> to set the value from outside also
+  
+  - create a clock, with features like startTime, endTime, duration of running, stopping and starting and throwing error if already stooped/running
+      function timer() {
+            let startTime = 0;
+            let endTime = 0;
+            let running = false;
+            let duration = 0;
+            let seconds = 0;
+            this.start = function () {
+                if (running) {
+                    throw new Error("Its already running"); # throwing the error
+                }
+                else {
+                    running = true;
+                    startTime = new Date().getTime(); # getting current time from the Date object
+                    console.log("started")
+                }
+            }
+            this.stop = function () {
+                if (!running) {
+                    throw new Error("Its already stopped");
+                }
+                else {
+                    running = false
+                    endTime = new Date().getTime();
+                    seconds = (endTime - startTime) / 1000;
+                    console.log("It ran " + seconds / 1000 + " seconds in this session");
+                    duration += (endTime - startTime) / 1000;
+                }
+            }
+            this.reset = function () {
+                startTime = new Date().getTime();
+                endTime = 0;
+                running = false;
+                duration = 0;
+                seconds = 0;
+            }
+            Object.defineProperty(this, 'duration', {
+                get: function () {
+                    console.log(duration);
+                }
+            });
+        }
+        const obj = new timer();
+  
+  - object (extended)
+    - Object.keys(<object_name>) --> return array of all the keys (properties)
+    - Object.values(<object_name>) --> array of all the values
+    - Object.entries(<object_name>) --> returns array of key value pairs
+  - String methods
+    - length --> length of the string
+    - toLowerCase --> converts the whole string to lower case
+    - toUpperCase --> converts to upper case
+    - includes --> checks if the string contains the character or not
+    - startswith, endswith
+    - search --> return the position of the character if found
+    - match --> return the array of the matched data
+    - indexOf --> returns the first occurence of value in the string
+    - lastindexof --> returns the position oif last index
+    - replace
+    - trim --> remove extra whitespaces
+    - charAt --> character at that positon
+    - concat
+    - split
+    - repeat(no_of_times) 
+    - substr
+    - toString --> converts to string
+    - valueOf --> print the default string
+  - PROMISES
+    const posts = [
+        { title: "post 1", body: "this is body 1" },
+        { title: "post 2", body: "this is body 2" },
+    ]
+    function getPost() {
+        setTimeout(() => {
+            let output = "";
+            posts.forEach((post) => {
+                output += `<li>${post.title}</li>`
+            });
+            document.body.innerHTML = output;
+        }, 1000)
+    }
+
+    function createPost(post, callback) {
+        setTimeout(() => {
+            posts.push(post);
+            getPost()
+        }, 2000)
+    }
+    createPost({ title: "post 3", body: 'this is post 3' }, getPost)
+
+    --> posts is an array
+    --> we area basically changing html content of the webpage, inserting list items
+    --> getPost will display the content
+    --> setTimeout is to take some time for display of the list
+    --> createPost is to form the list
+    --> now if we do createPost and just pass posts array there, and then call getPost, it wont work because of the timeout
+    --> also we want to do getpost after createpost is done
+    --> so here callback function is used to tell the function createPost that it has to execute a function after its work is done
+    --> we givve getPost as a callback function
+    --> also mentions getPost after posts.push(), to ensure its execution
+
+    ANOTHER way to do the above functionality is to use promises
+    
+    const posts = [
+        { title: "post 1", body: "this is body 1" },
+        { title: "post 2", body: "this is body 2" },
+    ]
+
+    function getPost() {
+        setTimeout(() => {
+            let output = "";
+            posts.forEach((post) => {
+                output += `<li>${post.title}</li>`
+            });
+            document.body.innerHTML = output;
+        }, 1000)
+    }
+
+    function createPost(post) {
+        setTimeout(() => {
+            posts.push(post);
+            // #getPost()
+        }, 2000)
+    }
+    createPost({ title: "post 3", body: 'this is post 3' })
+
+    function createPost2(post) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                posts.push(post);
+                const error = false;
+                if (!error) {
+                    resolve();
+                }
+                else {
+                    reject("Something went wrong")
+                }
+            }, 2000)
+        })
+    }
+
+    createPost2({ title: "post 4", body: "this is body 4" })
+        .then(getPost)
+        .catch((err) => console.error(err)) #note "console.error"
+    
+    --> createPost2 function returns a promise, 
+    --> promise means that the given function will be executed, either successfully (resolve)
+        or give an error(reject)
+    --> const error= false -> is a flag that we used ourselves (it is kinda an error)
+    --> .then(getPost) makes run getPost if the promise resolve()
+    --> else err is thrown and caught in catch(err)
+    --> we not using callback function in createPost becuase we are using getPost in the createPost2 and it does the needful
+
+  - API Calling
+    const p4 = fetch('https://jsonplaceholder.typicode.com/users')
+        .then((value) => value.json())
+        .then((res) => console.log(res));
+
+    async function init() {
+        let res = await fetch('https://jsonplaceholder.typicode.com/posts')
+        let data = await res.json()
+        console.log(data)
+    }
+
+    init()
+
+    --> fetch calls the API, here we have used an sample API available publically
+    --> if API calling is successful, it goes to 'then' converts into json
+        then it further prints it through 'res'
+
+    --> in the second API fetch, we are using async await
+    --> we take the data into res, await to ensure reading fully
+    --> converts res into json format, await to ensure full conversion
+    --> and then logs the data
+
+  - testing JS file
+    - create a folder
+    - npm init --yes in it
+    - npm install jest
+    - in package.json. in scripts edit the test field value to "jest --coverage"
+    - create a .js file, and initialize your functionality in it
+    - we are creating a simple sum function in it ans exporting it
+        function sum(a, b) {
+            return a + b
+        }
+
+        module.exports = sum
+    - create another file named sum.test.js
+        const { expect } = require("@jest/globals");
+        const sum = require("./sum")
+
+        test('Adds two numbers', () =>{
+            expect(sum(1,2)).toBe(3)
+        })
+
+      --> expect is a named export from jest
+      --> 'Adds two numbers' is the title of our test
+      --> it calls the sum(1,2) and expects the answer to be 3, throws error if gets anything else
+    
+    - npm test -> to run the test
+      - it runs all the .test.js file in the folder
+
+- CSS
+  - style tag
+  - .<classname> -> for applying CSS throught class attribute
+  - "#<idnanme>" -> for applying CSS throught id attribute
+  - <tag_name> --> apply CSS to every tag (i.e. every div tag, body tag -> to whole body etc)
+  - div p{} --> inside style tag (combinators)
+    - applies to every p tag inside div tag
+  - div > p {} --> applies to direct child of div (child selectors)
+  - div + p{} -> immediate p after div (adjacent)
+  - div~p{} --> every p after d will be selected (general sibling)
+  - pseudo class ->mouse hover example
+    - 
+      button {
+          background-color: red;
+          color: white;
+          padding: 0.5rem;
+          margin: 10px;
+          border: 1px solid red;
+          border-radius: 6px;
+          width: 4rem;
+          cursor: pointer
+      }
+      button:hover {
+          background-color: blue;
+          width: 10rem;
+      }
+      --> button:hover, is the pseudo class
+      --> the button will have CSS
+      --> when we hover the mouse over the button it will change its CSS to what is written in the button:hover
+
+  
+  - pseudo elements -> first line example, first-letter
+      p::first-letter{
+          color: red;
+          font-size: 2rem;
+      }
+  - ::selection{
+        color:red;
+        background-color: yellow;
+    }
+    --> changes the css on selection
+  - @media screen and (max-width: ){} --> to make the css change on changing the size
+    - we can use min-width instead of max-width also
+  
+  - Transitions
+      div{
+          width: 100px;
+          height: 100px;
+          background-color: red;
+          margin: 20px;
+          transition: width 2s, height 2s; #time taken in transition
+          transition-delay: 2s; # transition start after delay of 2s
+      }
+      #on hovering the dimension of div container changes
+      div:hover{
+          width: 300px;
+          height: 300px;
+      }
+      #div1{
+          transition-timing-function: linear;
+      }
+      #div2{
+          transition-timing-function: ease;
+      }
+      #div3{
+          transition-timing-function: ease-in;
+      }
+      #div4{
+          transition-timing-function: ease-out;
+      }
+      #div5{
+          transition-timing-function: ease-in-out;
+      }
+
+      html:-
+      <div id="div1">linear (everything in same pace)</div>
+      <div id="div2">ease (slow-fast-slow)</div>
+      <div id="div3">ease-in (slow then fast)</div>
+      <div id="div4">ease-out (fast then slow)</div>
+      <div id="div5">ease-in-out (slow start and slow end)</div>
+  
+  - flex-container
+    - to design flexible layout structures
+  
+  - animations
+      div {
+          width: 100px;
+          height: 100px;
+          background-color: red;
+          animation-name: divanimation; # to make the keyframe know, on which it has to apply the frame changes
+          animation-duration: 12s; # duration of animation
+      }
+
+      @keyframes divanimation {
+          from {
+              background-color: red;
+          } # from start
+
+          to {
+              background-color: yellow;
+          } # to end
+      }
+
+      @keyframes divanimation {
+          0% {
+              background-color: red;
+          } # at 0% completion (i.e start)
+
+          25% {
+              background-color: pink;
+          } # at 25% completition
+
+          50% {
+              background-color: brown;
+          } # at 50% completition
+
+          100% {
+              background-color: green;
+          } # at 100% completition
+      }

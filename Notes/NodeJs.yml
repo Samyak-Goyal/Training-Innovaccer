@@ -1,0 +1,441 @@
+- NodeJS is single threaded and have multi instances
+- Event looping --> as nodejs is single threaded, certain tasks has to wait sometimes, to ensure that they run, they are
+  put into a stack so that they can be exacuted later, a loop runs infintely and check the stack for any pending events, this is called event looping
+- REPL
+  - Read-Eval-Print Loop
+- global instead of window object (window object that was in javascript)
+
+- module.exports --> 
+  - each file in nodejs is called as module
+  - to export one file so that another file can use it, module.exports is used
+  - example, helper is the module to be exported to index.js module
+    - helper
+    function logdata(log) {
+        console.log(log)
+    }
+
+    module.exports.logdata = logdata
+
+    - index.js
+    const helper= require("./helper.js")
+    helper.logdata("this is a log")
+
+    --> module.exports.<alias_name>= <function_to_be_exported>
+    --> to export more than one function, put them in a class and export that class
+    --> const helper= require("./helper.js") is importing the file
+    --> helper.<alias_name>, to call that function from the file
+
+- Synchronous vs Asynchronous functions
+  - synch --> must complete their execution before other function starts
+  - async --> runs, doesn't matter if earlier is done or not
+
+  - sunc function example
+    const fs = require("fs");
+    console.log(__dirname)
+    console.log(fs.readdirSync(__dirname))
+    console.log("Data read completed")
+
+    --> console.log(_dirname) --> prints the current dir path
+    --> console.log(fs.readdirSync(__dirname)) --> prints the folders and files in the current dir in the form of a array
+    --> after the list is printed, no matter how long it is then only "data read completed" will be printed, as it is sync (because we used readdirsync)
+
+  - async function example
+    fs.readdir(__dirname, function(err,arr){
+        console.log(arr)
+    })
+    console.log("end of async")
+
+    --> readdir is async function
+    --> as there is a callback function in the function arguement, the readdir is done, it will not wait for the callback function to execute and (here) print the list of the files/folders
+        but will jump to the next operation and prints "end of async".
+    --> this is async function
+
+- Event Handling
+  - here we are creating an event in the helper.js and then emitting it
+    we are then trying to subscribe it throught index.js
+  
+    - index.js
+      const EventEmitter = require('events');
+      
+      const emitter= new EventEmitter();
+      emitter.on("logrecord", (obj) => {
+          console/localStorage("subcribed")
+          console.log(obj.currentLog)
+      })
+      helper.logdata("this is a log")
+
+    - helper.js
+      const EventEmitter = require('events')
+
+      const emitter = new EventEmitter();
+
+
+      function logdata(log) {
+          console.log(log)
+          emitter.emit("Logrecord", { currentLog: log })
+      }
+
+      module.exports.logdata = logdata
+
+      --> events is exporting a class, so we are creating the object emitter
+      --> emiiter.on in index.js is like turning the radio on and waiting for the frequency, while .emit is already transmitted the freq
+      --> then helper.logdata("this is a log") -> calls the helper.js and it catches the frequenect
+      --> this will not work...
+      --> it will not work because there are two instances of "emitter", one in index and another in helper
+      --> and one instance has no relation with the other instance
+      --> to tackle it, we create another module and in it we export the instance only, not some function made out of it
+    
+    - index.js
+      const EventHelper = require("./eventhelper.js");
+      const eventobj= new EventHelper()
+
+      eventobj.on("LOGRECORDED", (result) =>{
+          console.log(JSON.stringify(result))
+      })
+
+      eventobj.triggerEvent("DATA PASSED")
+
+    - eventhelper.js
+      const EventEmitter = require('events')
+
+      class EventHelper extends EventEmitter {
+          triggerEvent(logs) {
+              this.emit("LOGRECORDED", { currentlog: logs })
+          }
+
+      }
+
+      module.exports = EventHelper;
+
+      --> class EventHelper is the instance which we are exporting
+      --> now as the instance is same, the subscription will be done and the log statement "data passed" will be printed
+
+- publishing npm package
+  - we created a npm folder
+    - npm init --yes
+    - change the name in package.json to your desrired repo name
+    - change the version on subsquent publishes
+    - now create the index.js and put your code there, example
+
+      module.exports.calculate= function (total, tax, currency) {
+          return total + total * (tax / 100) + " " + currency
+      }
+      
+      --> here we are directly exporting the function created, or we export the class with all the functions
+    - now go to npmjs.com
+    - sign in
+    - in your local terminal
+      - npm login
+        - type in the credentials
+      - npm publish 
+        - will be published with the name and version as in the package.json
+    - now your package is published at the npm
+    - to install -> npm install <package_name>
+    - if we have already installed the package and we think that the package is updated
+      - as we have installed the package so it will be in dependencies
+      - run --> npm update 
+
+- assignment:- to create an npm package, publish it, create a docker, in its index.js import this package, build the image, publish the image, pull it and run the container
+  
+- HTTP module
+  - js file
+    const http = require("http")
+    const myserver = http.createServer((request, response) => {
+        response.writeHead(200, { 'Content-Type': 'text/html' })
+        response.write("<h2>SERVER WORKED</h2>")
+        response.end();
+    })
+
+    myserver.listen(3000)
+
+    myserver.on("connection", (result) => {
+        console.log("Connection Established")
+        console.log(result)
+    }) #myserver is emitting as well as subscribing to the event (instance does it)
+
+    --> http emits event named "connection" internally, so it will need the name "connection" to subscribe
+    --> writeHead --> tells the browser what kind of request it is and what kind of content we are displaying, i.e HTML (here). 200 is the status code
+    --> things to keep in mind
+      - 3000 port
+      - "connection" is the require event name
+      - writeHead
+      - status code
+        - 200 -> everything is fine
+        - 500 -> internal error
+        - 404 -> not found
+  
+- pm2 --> very good thing to use
+  - npm install -g pm2
+  - it is an package like nodemon, but advance version
+  - will not keep the server busy when running the node module
+  - pm2 start server.js --name="name_of_instance" --watch
+  - --watch --> ensure there is no need to reload the server again and again, changes will be updated automatically
+  - --name --> name of instance to be created in pm2
+  - pm2 stop name_of_instance --> to stop the instance
+  - pm2 delete name_of_instance --> to delete the instance
+
+- Reading the html files from nodejs
+  const http = require("http")
+  const fs = require("fs")
+  const myserver = http.createServer((request, response) => {
+      response.writeHead(200, { 'Content-Type': 'text/html' })
+
+      var myurl = request.url;
+      //response.write("<h2>SERVER WORKED</h2><p>"+myurl+"</p>")
+      if (myurl === "/form1") {
+          const form1 = fs.readFileSync("./htmlpages/home.html")
+          response.write(form1)
+      }
+      else if (myurl === "/form2") {
+          const form2 = fs.readFileSync("./htmlpages/index.html")
+          response.write(form2)
+      }
+      else if (myurl === "/register") {
+          response.write("Registration Done!")
+      }
+      else {
+          response.write("<h2>SERVER WORKED</h2><p>"+myurl+"</p>")
+      }
+
+      response.end();
+  })
+
+  --> request.url -> gives the url at which the request is made from (localhost:300/<url>), <url> is the url
+  --> readfilesync -> synchronous function, so that the file is read first then the output is shown
+  
+- express nodejs
+  --> npm install express, then save the below file as JS
+    const express = require("express")
+    const app = express()
+    #// var bodyParser =require("body-parser")
+    #// app.use(bodyParser.json());
+    app.use(express.json()); #middleware
+    app.use(express.urlencoded({ extended: true })); #middleware
+
+    app.use((req, res, next) => {
+        req.requestTime = Date.now()
+        console.log("Router Called", Date.now())
+        next()
+    }) #middleware
+
+    app.use('/home', (req, res, next) => {
+        console.log("Middleware called for home")
+        next()
+    }) #middleware
+
+    app.use('/', (req, res, next) => {
+        console.log("Middleware called for root -step1")
+        next();
+    }, (req, res, next) => {
+        console.log("Middleware called for root - step 2")
+    }, (req, res, next) => {
+        console.log("Middleware called for root - step3")
+        next()
+    }) #middleware
+
+    app.use("/test", (req, res, next) => {
+        req.query.fullname = req.query.fullname.toLowerCase();
+        req.requestTime = Date.now();
+        res.send("You are not allowed")
+    }) #middleware
+
+    app.get("/test", (req, res) => {
+        console.log(req.requestTime)
+        res.send("The full name is " + req.query.fullname)
+    })
+
+    app.get("/", (request, response) => {
+        console.log(req.requestTime)
+        response.send("<h2>Welcome to express demo</h2>")
+    })
+
+    app.get("/home", (req, res) => {
+        console.log(req.requestTime)
+        let fullname = req.query.fullname
+        res.send("<b>Home Page</b>" + fullname)
+    })
+
+    app.get("/login/:email/:password", (req, res) => {
+        console.log(req.requestTime)
+        let email = req.params.email
+        let pwd = req.params.password
+        res.send("login " + email + " " + pwd)
+    })
+
+    app.get("/form", (req, res) => {
+        res.sendFile(__dirname + "/htmlpages/index.html")
+    })
+
+    app.post("/register", (req, res) => {
+        let first_name = req.body.first_name
+        let email = req.body.email
+        res.send("hi " + first_name + "<br>" + "your email is " + email)
+    }) # note the app.post is there
+    app.listen(3000, () => {
+        console.log("Server Started")
+    })
+
+    --> middleware -> it gets executed before the function call, i.e. it is basically kindof a preprocessing
+    --> they can be used for authentication also, like before executing a particular url, the middleware
+        associated with it get executed and checks if the person is authorised to access it or not
+    --> app.use -> is the middleware declaration
+    --> app.use("/home") -> middle ware that will be exacuted before /home
+    --> (req,res,next) -> request, response (to the request), next , it is a tick which must be included
+    --> in each middleware we can see that next(), is included, it is must to make middleware transition to the function after it, or it will get stuck
+    --> app.get -> is to get the request from the http page
+    --> http post is to get some content posted at html page for our use, 
+    --> in app.get("/form") -> we made the user to fill a form, and at the submit button it trigger action="/register"
+    --> now app.post(register) is used because in form we have user has method="post"
+    --> now there are two middleware
+        - app.use(express.json()); #middleware
+          app.use(express.urlencoded({ extended: true })); #middleware
+
+          they are use to parse request data from the url in the form of json object
+    --> req.body.first_name --> get the first_name (which is in the name attribute of inpur function)
+    --> res.send can include html in it, so it is used to display the first_name and email that we got from the form filled by the user
+
+- Routing different modules (Modularity)
+  - linking another module (file) to the main file, so as to keep functionalities modularized
+  - say, our main file (server.js) is:- 
+
+    const express = require("express")
+    const app = express()
+
+    app.use("/user", require("./users")) # lazy importing
+
+    app.use("/roles", require("./roles"))
+
+    app.get("/", (req, res) => {
+
+        res.send("<h1>Welcome to Node</h1>")
+    })
+    app.get("/about", (req, res) => {
+
+        res.send("<h1>Welcome to Node</h1>")
+    })
+
+    app.get("/dashboard", (req, res) => {
+
+        res.send("<h1>Welcome to Node</h1>")
+    })
+
+    app.listen(3000, (obj) => {
+        console.log("Connected")
+    })
+
+  - users.js
+    const express = require("express")
+    const router = express.Router();
+
+    router.get("/", (req,res)=>{
+        res.send("Welcome to the user root page")
+    })
+
+    router.get("/list", (req, res) => {
+        res.send("User listing page");
+    })
+
+    router.get("/details/:id", (req, res) => {
+        res.send("User Details page for id " + req.params.id);
+    })
+
+    module.exports = router
+  
+  - roles.js
+    const express = require("express")
+    const router = express.Router();
+
+    router.get("/", (req, res) => {
+        res.send("Welcome to Roles Page")
+    })
+
+    router.get("/list", (req, res) => {
+        res.send(`This is the list of users available
+        <ul>
+            <li>Doctor</li>
+            <li>Nurse</li>
+            <li>Patient</li>
+        </ul>`)
+    })
+
+    router.get("/details/:id", (req, res) => {
+        var id= req.params.id
+        if(id === "1") res.send("Hi Doctor How are you!")
+        if(id === "2") res.send("Hi Nurse How are you!")
+        if(id === "3") res.send("We see you are a Patient, Well how are you?")
+    })
+
+
+    module.exports = router
+
+  --> router functionality of express object -> to creates route to link them
+  --> lazy importing -> creates a middleware and import the module in there
+  --> to go to the /list page of /roles, we will type localhost:3000/roles/list
+      - we will see the list there
+  --> so we have created a route named /users (or /roles) to get to that module
+  --> we can create one index file and include all routes in it
+
+- DATABASE Connection
+  - NodeJs generally pairs with MONGODB so we will see to it
+  - open robo3t, i.e. create a database
+  - now do one thing, create an collection with name in lowercase and plural, like employees, roles not Employee or role
+  - npm install mongoose mongodb
+    - mongoose is ODM, i.e. it facilitates us to use mongodb in the best possible and easiest way as everybody has different style of writin queries
+      so to generalise it we use mongoose, it runs queries in the most optimal way
+    - mongodb is the driver here for mongodb
+  - now the server.js
+    const mongoose = require("mongoose")
+    const { Schema } = require('mongoose')  # named export, that's why {}are used
+
+    app.get("/employee", (req, res) => {
+        const EmployeeSchema = new Schema({
+            firstname: String,
+            lastname: String,
+            email: String,
+            age: Number,
+            isMarried: Boolean
+        });
+
+        let Employee = mongoose.model("employee", EmployeeSchema)
+        
+        const AllEmployees = Employee.find({}).then((err,emp) =>{
+            console.log(emp)
+            
+            console.log(err)
+        });
+      
+
+        res.send("employee result")
+    })
+
+    app.listen(3000, (err) => {
+        mongoose.connect("mongodb://localhost/innovaccer").then(() => {
+            console.log("Database connected successfully")
+        }).catch((err) => {
+            console.log("Databse connection denied")
+            conslotchange.log(JSON.stringify(err))
+        })
+        console.log("Connected")
+    })
+
+    --> we created a schema named EmployeeSchema
+    --> mongoose.model -> connect the already created databse with the schema
+        - note that we type "employee" as mongoose by default lowercase it and makes it plural, and that's why earlier we created collection in lowercase and plural
+    --> AllEmployess, find the employees details and logs it on the console
+    --> while opening the port we also opens the connection for mongodb
+    --> mongoose.connect("monogdb://<server>/<database_name>")
+        - server can be localhost or ec2 server etc.
+    --> .then works as try catch
+    --> the thing is that the above way displays data in the console, not on the webpage
+    --> as this is an single threaded process, once the schema is created it will be stored with the instance, so it will
+        throw error
+
+- Creation/ database_connection/ create user through NodeJs
+  - project been deployed to Github
+  - to use, one can also delete the node_modules folder, for faster transeferring and run "npm install" afterwards
+  - main thing to note:- AWAIT and ASYNC
+  - as there are some queries that take time to execute and if there are asynchronous function , they wont wait for that
+    query and will execute, which we might not want
+  - so we write "await" before such queries, and async before the function defination
+  - this tells the interpreter that it must wait for the query to execute and then run further keeping the function synced
+  - to know the implementation, visit the NodeTrainingAuth repo

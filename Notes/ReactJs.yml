@@ -1,0 +1,693 @@
+- About
+  - it is an library containing various UI components
+  - it follows a tree structure
+  - it works on virtual DOM
+    - it makes copy of the changes, and updates the realDOM at one go, not everytime a change is made
+    - so it is faster
+  - npm vs npx 
+    - npm tells to install and then use
+        npm install -g create-react-app
+        create-react-app <project_name>
+    - npx allows to just use it without installing
+        npx create-react-app <project_name>
+  
+- to update NODE
+  - sudo npm install -g n
+  - sudo latest n
+
+- create reactapp
+  - in the folder where you want to create app
+  - npx create-react-app <app_name>
+
+- reactapp contains various components
+  - see the App.js file in src module inside the reactapp
+  - each js file will have
+    - import statements
+    - function/ arrow/ class
+      - name of the function should be in pascal casing
+      - return
+    - export default
+  - the reutrn have JSX element (html content to JS variable)
+    - JSX code is assigning html code to JS
+  - a single JSX must have only one parent element and everything else is supposed to be child element
+
+- we can create other components and use them in App.js (importing) (creating todoapp)
+  - the component should start from capital letter (pascal casing)
+  - create a folder "Components" -> create a file with pascal naming and implement your functionality in JSX
+  - import file in App.js 
+  - in the div tag in return (or any other you creates, but it should be only one, as only one parent element is allowed)
+  - import Todoitem from "./Components/Todoitem/Todoitem"
+  - in div tag type, <Todoitem /> 
+    - it will implement the JSX from Todoitem
+  - npm start --> to run the server
+  - src/index.js is rendered in the browser
+  - if we want to use some variables, declare them before the return statement
+  - we can inject them in the JSX using {}
+      import "./TodoItem.css";
+      function ToDoItem() {
+          const title = "Buy books"
+          const priority = "Medium"
+          const todoDate = new Date(2022, 7, 19)
+          return (
+              <div className="todo-item">
+                  <div>{todoDate.toLocaleString()}</div>
+                  <div className="todo-description">
+                      <h2 >{title}</h2>
+                      <div className="todo-priority">{priority}</div>
+                  </div>
+              </div>
+          )
+      }
+      export default ToDoItem
+  - app.js
+      import logo from './logo.svg';
+      import './App.css';
+      import Ti from "./Components/TodoItem/ToDoItem"
+
+      function App() {
+        return (
+          <div>
+            <Ti />
+            <Ti />
+            <Ti />
+            <Ti />
+          </div>
+        );
+      }
+
+      export default App;
+  - in the above example, the 4 <Ti /> will have the same values as given in the todolist.js
+  - if we want to use diff properties in diff tags
+  - we do the modification in app.js as:-
+        <Ti title="this is the first title" priority="Medium" date='2022-30-12' />
+        <Ti title="this is the second title" priority="Low" date='2021-30-12' />
+        <Ti title="this is the third title" priority="High" date='2022-02-12' />
+        <Ti title="this is the fourth title" priority="Medium" date='2022-3-12' />
+  
+  - now as we want to display each separately we do in todolist.js
+      import "./TodoItem.css";
+      function ToDoItem(props) {
+          const title = props.title
+          const priority = props.priority
+          const todoDate = props.date
+          return (
+              <div className="todo-item">
+                  <div>{todoDate.toLocaleString()}</div>
+                  <div className="todo-description">
+                      <h2 >{title}</h2>
+                      <div className="todo-priority">{priority}</div>
+                  </div>
+              </div>
+          )
+      }
+
+      export default ToDoItem
+    
+  - we are passing "props" in the ToDoItem function, it works as an object
+  - we can access the values from object using "."
+  - further we can also create various other files and folder containing dates, todos (also apply CSS to them there)
+  - props.children --> all the content inside the tag in which we are passing props
+  - if we want to change the content on clicking a button, we cant just change the value of the variab;e in the function that is happening onClick
+    - because react doesn't allow us to change UI after the page is render
+  - to do , we use hooks
+    - anything starts with "use" is a hook
+    - always defined in the function only
+  - we will use useState()
+    - import {useState} from 'react'
+      const [userTitle, setTitle] = useState (props.title)
+
+      --> userTitle will take the value passed to the useState
+      --> setTitle is an function, which sets the title again to the useState
+
+      we will do like
+      const buttonClickHandler = () => {
+          setTitle("this is new title") # on click title changes to this
+          #// title = "This is new UPDATED title" --> eariler which didn't work
+          #// console.log("Button clicked")
+      }
+    
+    - useState internally refreshes the page and through setTitle (we named the function, not necessary to keep it like this)
+      sets the title, and the new values passes to userTitle
+
+    - useState example
+        import { useState } from "react";
+        import "./TodoItem.css";
+        import TodoDate from "../TodoDate/TodoDate";
+        import Card from "../UI/Card/Card";
+
+        function ToDoItem(props) {
+            const [userTitle, setTitle] = useState(props.title)
+            const [textChange, setTextChanged] = useState(false)
+            const [userP, setP] = useState(props.priority)
+
+            let title = props.title
+            let priority = props.priority
+            const todoDate = props.date
+
+            const buttonClickHandler = () => {
+                setTitle("this is new title")
+                setTextChanged(textChange => !textChange)
+                setP("High")
+                console.log(userTitle)
+            }
+
+            return (
+                <Card className="todo-item">
+                    <TodoDate userDate={todoDate} />
+                    <div className="todo-description">
+                        <h2 className={`${textChange == true ? "color2" : "color1"}`}>{userTitle}</h2>
+                        <div className="todo-priority">{userP}</div>
+                        <button onClick={buttonClickHandler}>Change Text</button>
+                    </div>
+                </Card>
+            )
+        }
+
+        export default ToDoItem
+
+    - another useState example
+      - we are creating a form for the todos, to enter them
+      - to get the data, we use useState
+      - TodoForm.js
+        - there are various way to do so
+        - one is to do as we did in the previous example
+        - add onChange event to input tag and then create handler functions for it
+        - other is to create one useState only for all of then, and as initial value pass and object to it
+        - in the handler function, when we update the value using setInput function, pass the object, but we need the 
+          previous values of the object, to get it we use spread operator
+        - the above solution works, but the problem is that if we have too much going in the object that we passed in the 
+          useState, we can loose some data in the virtual DOM
+        - to handle it, if we pass a function in setInput, react automatically handles it and send the latest data to the request
+        - code:- 
+            import "./TodoForm.css"
+            import { useState } from "react";
+            const TodoForm = () => {
+
+                #// const [title, setTitle] = useState('')
+                # // const [todoDate, setTodoDate] = useState('')
+                # // const [priority, setPriority] = useState('')
+
+                const [userInput, setInput] = useState({
+                    title: '',
+                    todoDate: '',
+                    priority: 'Low'
+                })
+
+                const titleChangeHandler = (event) => {
+                    setInput((prevState) => {
+                        return { ...prevState, title: event.target.value }
+                    }) # we are passing other function inside the setInput, and prevState holds the latest data that is updated
+
+                    # // setInput({
+                    # //     ...userInput,
+                    # //     title: event.target.value
+                    # // })
+
+                    # // setTitle(event.target.value)
+                    # // console.log(event.target.value)
+                }
+                const dateChangeHandler = (event) => {
+                    setInput((prevState) => {
+                        return { ...prevState, todoDate: event.target.value }
+                    })
+                    # // setInput({
+                    # //     ...userInput,
+                    # //     todoDate: event.target.value
+                    # // })
+                    # // // setTodoDate(event.target.value)
+                    # // console.log(event.target.value)
+                }
+                const priorityChangeHandler = (event) => {
+                    setInput((prevState) => {
+                        return { ...prevState, priority: event.target.value }
+                    })  
+                    # // setInput({
+                    # //     ...userInput,
+                    # //     priority: event.target.value
+                    # // })
+                    # // setPriority(event.target.value)
+                    # // console.log(event.target.value)
+                }
+                const submitHandler = (event) => {
+                    event.preventDefault()
+                    console.log("title ", userInput.title, " date ", userInput.todoDate, " priority ", userInput.priority)
+                }
+
+                return (
+                    <form onSubmit={submitHandler}>
+                        <div className="todo-controls">
+                            <div className="todo-control">
+                                <label htmlFor="title">Title</label>
+                                <input type="text" name="title" id="title" onChange={titleChangeHandler} />
+                            </div>
+
+                            <div className="todo-control">
+                                <label htmlFor="date">Date</label>
+                                <input type="date" name="date" id="date" onChange={dateChangeHandler} />
+                            </div>
+
+                            <div className="todo-control">
+                                <label htmlFor="priority">Priority</label>
+                                <select onChange={priorityChangeHandler} >
+                                    <option value="Select">---Select---</option>
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="todo-actions">
+                            <button type="submit" className="btn">Add todo</button>
+                        </div>
+
+                    </form>
+                )
+            }
+
+            export default TodoForm
+          
+        - if we want to give values to the form by default we do:-
+            import "./TodoForm.css"
+            import { useState } from "react";
+            const TodoForm = () => {
+                # setting current date
+                const date = new Date()
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                if (month < 10) {
+                    month = "0" + month
+                }
+                if (day < 10) {
+                    day = "0" + day
+                }
+                const year = date.getFullYear();
+                const today = year + "-" + month + "-" + day;
+                const [title, setTitle] = useState('Initial title')
+                const [todoDate, setTodoDate] = useState(today)
+                const [priority, setPriority] = useState('Low')
+
+                // const [userInput, setInput] = useState({
+                //     title: '',
+                //     todoDate: '',
+                //     priority: 'Low'
+                // })
+
+                const titleChangeHandler = (event) => {
+                    // setInput((prevState) => {
+                    //     return { ...prevState, title: event.target.value }
+                    // })
+
+                    // setInput({
+                    //     ...userInput,
+                    //     title: event.target.value
+                    // })
+
+                    setTitle(event.target.value)
+                    // console.log(event.target.value)
+                }
+                const dateChangeHandler = (event) => {
+                    // setInput((prevState) => {
+                    //     return { ...prevState, todoDate: event.target.value }
+                    // })
+                    // setInput({
+                    //     ...userInput,
+                    //     todoDate: event.target.value
+                    // })
+                    setTodoDate(event.target.value)
+                    // console.log(event.target.value)
+                }
+                const priorityChangeHandler = (event) => {
+                    // setInput((prevState) => {
+                    //     return { ...prevState, priority: event.target.value }
+                    // })
+                    // setInput({
+                    //     ...userInput,
+                    //     priority: event.target.value
+                    // })
+                    setPriority(event.target.value)
+                    // console.log(event.target.value)
+                }
+                const submitHandler = (event) => {
+                    event.preventDefault()
+                    console.log("title", title, "date", todoDate, "priority", priority)
+                    setTitle("")
+                    setTodoDate("")
+                    setPriority("")
+                }
+
+                return (
+                    <form onSubmit={submitHandler}>
+                        <div className="todo-controls">
+                            <div className="todo-control">
+                                <label htmlFor="title">Title</label>
+                                // # add the value attribute to the input section, in it set the default value
+                                <input type="text" name="title" id="title" onChange={titleChangeHandler} value={title} />
+                            </div>
+
+                            <div className="todo-control">
+                                <label htmlFor="date">Date</label>
+                                <input type="date" name="date" id="date" onChange={dateChangeHandler} value={todoDate} />
+                            </div>
+
+                            <div className="todo-control">
+                                <label htmlFor="priority">Priority</label>
+                                // #add the value attribute to select tag, in it set the default value
+                                <select onChange={priorityChangeHandler} value={priority}>
+                                    <option value="Select">---Select---</option>
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="todo-actions">
+                            <button type="submit" className="btn">Add todo</button>
+                        </div>
+
+                    </form>
+                )
+            }
+
+            export default TodoForm
+          
+        - if we want to pass the values (data) from todoform to another file (parent file) we do
+          - in the parent file where we have called todoform, we will create a function to handle the data, say the whole parent file looks like:-
+              import "./NewTodo.css"
+              import TodoForm from "../TodoForm/TodoForm"
+              const NewTodo = () => {
+                  const getFormData = (formData) => {
+                      console.log(formData)
+                  }
+                  return (
+                      <div className="new-todo">
+                          <TodoForm onSaveClick={getFormData} />
+                      </div>
+                  )
+              }
+
+              export default NewTodo
+            
+            --> onSaveClick is not a predefined function, it is just we named it so
+        
+          - in the child file (todoform):-
+              const userData = {
+                  title: title,
+                  date: todoDate,
+                  priority: priority
+              }
+              console.log("title", title, "date", todoDate, "priority", priority)
+              props.onSaveClick(userData)
+
+            --> we took props as parameter in the todoform function, and then in the submitHandler function we pass the data throught props, as it is an function so we will pass the data
+      
+        - for data storrage we can also use, redux and context API
+
+      - we have also done changes to the UI to show the content we entered
+      - inserted "key" in todos to facilitate the addition into the correct order
+  - we can see the todoapp all the files in the todoapp repo
+
+- create another app (storageapp)
+    - see github
+    - another hook
+        - useEffect()
+            - it takes two arguments 
+                - first is the functionality which is creating some error or is repetitive,
+                     or needs to be run once only (kinda function type)
+                - second is dependencies (array type)
+                    - dependency is nothing but the state at the change of which we want our useEffect to execute
+            - example
+                 useEffect(() => {
+                    const localStorageData = localStorage.getItem('userLoginState')
+                    if (localStorageData === 'LOGGED_IN') {
+                        setIsLoggedIn(true)
+                    }
+                }, []) #// first parament is function (which is causing error), [] are dependencies
+            
+                --> the functionality inside useEffect runs an infinite loop (see the app.js tu understand more clearly)
+            
+            - example
+                useEffect(() => {
+                    const identifier = setTimeout(() => {
+                        console.log("light weight baby")
+                        setFormIsValid(userEmail.includes('@') && userPassword.trim().length > 6)
+                    }, 3000)
+
+                    return () => {
+                        console.log("yead budddyy")
+                        clearTimeout(identifier)
+                    }
+
+                }, [userEmail, userPassword])
+
+                --> this is validation, it enables or disables the login button
+                --> the dependency is that it will execute when a change of state happends for userEmail or userPassword
+                --> this we are decreasing our traffic, as it will be done at when the dependency is satisfied
+                --> check the login.js file in the github
+                --> we can set setTimeout, inside useEffect to make it execute after some mentioned time
+                --> now if we want to make it eecute as when we stop typing the email then only the validation checks, i.e timeout occurs then only
+                --> so we use cleanup, i.e. the return() is the cleanup
+                --> in there we are clearing the timeout
+                --> so until we are typing only the return statement is getting executed, and as soon as we stop typing
+                    the state isn't changing anymore, so now the cleanup won't be called as useeffect is not in motion anymore
+                    so the pending timeout gets executed
+                --> what happens is that, cleanup happens when state is changed, and then when state is not changing the functionality is executed
+                --> in above example as cleanup happens, clearTimeout is done, so no more timeout is there in the stack
+                --> when we stop typing state is not changing anymore and the timeout occurs now
+
+        - useRef()
+            - used when we want to do only "get" on data
+                # ref-> to get data from real DOM
+                import { useState, useRef } from 'react'
+                function UserData() {
+                    const nameField = useRef()
+                    const lastnameField = useRef()
+                    // const [name, setName] = useState()
+                    // const nameChangeHandler = (event) => {
+                    //     setName(event.target.value)
+                    // }
+                    const submitHandler = (event) => {
+                        event.preventDefault()
+                        const name = nameField.current.value
+                        const lastname = lastnameField.current.value
+                        console.log(name,lastname)
+                        nameField.current.value=""
+                    }
+                    return (
+                        <form onSubmit={submitHandler}>
+                            <div>
+                                <label htmlFor="firstname">Firstname</label>
+                                <input type="text" name="firstname" id="firstname"  ref={nameField} />
+                            </div>
+                            <div>
+                                <label htmlFor="lastname">Lastname</label>
+                                <input type="text" name="lastname" id="lastname" ref={lastnameField}/>
+                            </div>
+                            <button type='submit'>Click</button>
+                        </form>
+                    )
+                }
+
+                export default UserData
+    - Fragment (from react module)
+        - as multiple parent elements are not allowed so we keep them in <div> tag, but these unuable div tag 
+            stil takes some time to render, so to handle that we use Fragment
+        - we use it as a tag like <Fragment> </Fragment>
+        - inside Fragment the code is returning props.children
+    
+    - use module.css , to prevent CSS overlapping
+        - import as a pointer, like:- import styles from "./Header.module.css"
+        - if .header is in Header.module.css , then in js, type the classname as styles.header
+        - and if it is as .header-abc, then type it as styles["header-abc"]
+
+    - Routing
+        - npm install react-router-dom --> to facilitate routing
+        - import {Routes, Route} from 'react-router-dom'
+        - also in index.js
+            - import {BroswerRouter} from 'react-router-dom'
+        - <Route path='<url> to visit when we want to go to this route' element=<page to render> />
+        -  <Routes>
+                <Route path='/welcome' element={<Welcome />} />
+            </Routes>
+
+            --> this is allowing the paths, that is we are allowed to access these paths
+
+
+- Another app (routingapp)
+    - see github repo
+    - Link tag (from react module)
+        - When we use <a> tag, the page refreshes bydefault
+        - to prevent this default behavior we use <Link>
+        - import {Link} from 'react-router-dom'
+        - <Link to=<url> element=<>> </link>
+        - link is basically <a> tag with preventDefault (in background)
+        - use of link is that it doesnt refreshes the page so it doesnt changes the state
+
+    - NavLink (from react module)
+        - if we want to use linking for navigation we use navlink
+        -   <NavLink to='/welcome' className={(activeValue) =>
+                activeValue.isActive ? styles.active : ""
+            }>Welcome</NavLink>
+
+            --> activeValue is the obnject which tells if we are on that link or not
+            --> isActive is its value which is boolean type
+                - true if we are on that page
+                - false if not on that page
+            --> styles.active to apply css on it
+
+    - useParams (hook)
+        - if we pass params through url like
+            '/product-details/:productId'
+
+            --> here :productId is a variable that will take param value
+        - now on the element that we inserting in Route tag
+        - we use useParams hook
+        - it will take all the params in the form of an object
+
+    - Navigate (from react-router-dom) 
+        - <Route path='/' element={<Navigate to='/welcome' />} />
+            --> if we just put some elemetn like, Welcome then we will be directed to but we wont see any change in the url
+            --> using navigate will also change the url to /welcome from / only
+
+    - Nested Routing
+        - if we want to say add more routes in welcome page, we give /welcome/* in app.js to tell it that it might have nested routing
+        - and in welcome.js 
+            import { Routes, Route, Link } from "react-router-dom";
+            import { Fragment } from "react";
+            const Welcome = () => {
+                return (
+                    <Fragment>
+                        <h1>This is Welcome Page!</h1>
+                        <Link to="guest-user">Guest user</Link>
+                        <Routes>
+                            <Route path="guest-user" element={<p>hi</p>}/> #no / before guest-user in path
+                        </Routes>
+                    </Fragment>
+                )
+            }
+
+            export default Welcome
+        
+        - there is another and better method to do the routing
+            - do nesting in the app.js only like
+                <Route path='/welcome/*' element={<Welcome />} >
+                    <Route path="guest-user"
+                        element={<p>This is parent user from app.js</p>}>
+
+                    </Route>
+                </Route>
+
+                --> here we are nesting the route inside the welcome/* only
+                --> in welcome.js where we want to show the output we set Outlet there (from react-router-dom) 
+            - welcome.js
+                import { Routes, Route, Link, Outlet } from "react-router-dom";
+                import { Fragment } from "react";
+                const Welcome = () => {
+                    return (
+                        <Fragment>
+                            <h1>This is Welcome Page!</h1>
+                            <Link to='guest-user'>Guest user</Link>
+                            <Outlet />
+                            # {/* <Routes>
+                            #     <Route path="guest-user" element={<p>hi</p>}/>
+                            # </Routes> */}
+                        </Fragment>
+                    )
+                }
+
+                export default Welcome
+        
+    - for a url that we havent provided a route to
+        - after all the routes in app.js
+        - write <Route path="*"> this means every route that wasn't listed before this route
+
+    - useNavigate (another hook)(from react-router-dom)
+        - used to navigate to a page from another page
+            const navigate = useNavigate()
+            const buttonClickHandler = () => {
+                navigate("/product")
+            }
+        - we could have used Link or a tag to handle it but if we have some other functionality associated
+            with out button then we cant handle that using Link/a tag
+        - some other functionality means, button is used to submit in a form and changes state or something
+        - navigate(-1) -> to go back to the previous page
+
+    - useReducer (hook)(from react module)
+        - const [state, dispatchFunction] = useReducer(reducerFunction, initialState)
+          dispatchFunction(type: "what action on which state", value:'value for state')
+          reducerFunction(state,action){}
+
+            --> reducerFucntion is handled outside of the function(main function)
+            --> action in reducerFunction == all the arguments from dispatchFunction
+        - useReducer is like useState the difference is that to handle different states we needed diff state function
+        - in useReducer we can accumulate them in one only
+        - in it when dispatch function is called, control goes to reducerFunction
+
+    - useContext (another hook)
+
+- another react app (reduxapp)
+    - see github
+    - concept of redux
+    - reducerFunction is used
+    - redux store is there, which can be modified using only reducerFunction but can be read by any component
+    - useSelector (hook)
+        - it gets access to the store internally (of the state)
+            - actualy, we informs it in index.js that what does that means
+        - means it is actually just subscribing
+    - useDispatch (hook)
+        - it is used to dispatch type and value to the reducerFunction
+    - reducerFunction takes two arguments, initial states and action (action = type+value from dispatch in the form of an object)
+
+- To HANDLE THE ReactDOM.render warning in console, add the below lines in index.js and remove the block of ReactDOM.render
+    import { createRoot } from 'react-dom/client'
+
+    const container = document.getElementById('root')
+    const root = createRoot(container)
+    root.render(<App />)
+
+- another react app (jesttesting)
+    - in app.test.js   
+        - we have imported render and screen from react module
+        - render is used to render component in testing file
+        - screen helps to get document by document and line by line in the file we rendered
+        - test -> is a global function, so we dont need to import it
+        - expect -> is a global function
+
+    - screen has three categories
+        - getBy (when expecting something to be on the screen)
+            - returns matching node, throw error if not matched or multiple matched
+            - getAllBy -> return an array of matching nodes if at least one found, no match found -> error
+        - query (wants to confirm if there or not)
+            - queryBy -> one match found > get matching node
+                - not found > return null
+                - multiple matches found > throw error
+        - find (for async tasks, because it will give one more try before failing)
+            - findBy -> return promise -> returns node
+                - if mulitple or no match is found > throws error
+            - findAllBy -> returns a promise > reutrns an array of matching nodes
+    
+    - 3 A's to follow in testing
+        - Arrange -> setup the test environment
+        - Act -> running certain logic
+        - Assert -> setting up the expectations for ourselves, seeing whether our expectations are met or not
+
+    - const hello_World = screen.getByText("Hello world", { exact: false })
+        - exact: false --> when we are not sure of casing and if the whole string is there or not
+
+    -   describe('Welcome', () => {
+            test("renders hello world", () => {
+                render(<Welcome />)
+                const hello_World = screen.getByText("Hello world", { exact: false })
+                expect(hello_World).toBeInTheDocument()
+            });
+
+            test("renders Good morning", () => {
+                render(<Welcome />)
+                const hello_World = screen.getByText("Good", { exact: false })
+                expect(hello_World).toBeInTheDocument()
+            })
+        })
+
+        --> this is a test suite having mulitple tests at the same time
+
+- PORATLS
+- SSR -> server side rendering

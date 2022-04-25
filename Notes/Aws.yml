@@ -1,0 +1,206 @@
+- multiple data centres -> availibilty zone (AZ) -> Region
+- register on aws console
+- enter card details and do the formalities
+- login as root user (if you are using your own account)
+  - log in as IAM user if login-ing as an enterprise user
+
+- EC2 
+    - Elastic Cloud Compute
+    - useful for mainly create instance
+    - instance is basically a virtual machine, gives a server to us
+
+  - creating and working with an INSTANCE
+    - Launch Instances
+    - for example lets create an ubuntu server
+    - search for ubuntu, and select the version you want to install
+    - as we are going with free version we will go with the free options that they are showing there
+    - now we will be directed to various steps
+    - select the instance in the 2nd step (t2.micro --> the free version)
+    - the network details
+    - the storage details (details of volume)
+    - the tags
+    - the secrity group
+    - the final page
+    - after clicking on launch, we will be seeing a prompt asking us to set up a private key
+    - create the private key and then DOWNLOAD it for SURE, or else we will not be able to download it again
+    - launch the instance
+    - we will be seeing a lot of details of the instance that we created
+    - we can set the name of the instance too
+    - clicking on the instance id we will see a new dailog box with all the details of the instance
+    - by default 22 port of the instance is allowed (for AWS)
+    - if we want to add another port then we have to go to security group -> inbound port -> add <port> and 0.0.0.0/0
+    - this way we will be allowed <port> at out public address of the instance
+    - to connect to the server with a machine
+    - go to connect tab at the dialog box, and follow the steps
+      - go to the location where you downloaded the Key file
+      - open the terminal and write --> chmod 400 <filename>
+      - and then ssh -i "<filename>" ubuntu@<public_ip>
+      - we will get connected to the server
+    - we are inside the server and configure it as we wish
+
+    - at the network stage, we scroll down and see the "user data" column, we can actually write a script there which will be initiated
+      once the instance is connected to the ssh, like we can give commands to install some softwares so that we dont have to do that manually
+
+  - NOTE : THAT WE RECIEVE ONLY 720 HOURS FREE PER MONTH, SO "STOP" THE INSTANCE WHEN NOT IN USE, JUST SHUTTING DOWN THE 
+    MACHINE WONT HELP.
+
+  - we can do the jenkins workflow that we did in the build and deploy in the build and deploy part, here instead of localhost:8080
+    we will be getting <public_ip>:8080 , so this ip can be shared with other people
+  
+  - creating a VOLUME
+        - the data that the instance holds is stored in a volume 
+        - it is created in the "storage" step while creating the instance
+        - we can create another volume and attach it to the instance
+        - this basically works like an external hard drive that we use, but virtual
+        - to attach the volume to the instance there must be some conditions satisfied
+        - as the external hard drive must be at the same location as the PC, same the volume must be at the same availibity zone
+        as the instance
+        - here, as the availibility zone is like us-east-1b, so the AZ should be same for both volume and instance for them to get attached
+        - now we can choose the AZ of volume while creating a volume as same as that of the instance
+        - and if we want to choose that of instance, it can be done while creating the instance
+        - at the network stage of creating the instance, in the subnet, select the same AZ as that of the volume and just proceed with the launch
+        - now the volume can be attached
+
+  - creating a snapshot
+        - snapshot, as the name signifies, takes a snap of the volume/instance at that particular instance
+        - lets say we have to shift our server from one region to another region due to any reason
+        - we have to be able to carry all out data (volume) with us
+        - the volume can't be attached to an instance out of their AZ, so snapshot come into play
+        - we create a sanpshot of the volume
+        - now we copy the snapshot at the desired AZ (able to choose while copying)
+        - now we will change our zone
+        - as we head to snapshot section we will be able to see our copied snapshot there
+        - we create a volume out of the snapshot (go to actions)
+        - now we see/note the AZ of the volume
+        - as we create instance there, keep in mind to choose the subnet correctly
+        - attach the volume and you will be able to get all the data in the instance
+
+  - Elastic IP
+        - EC2 service
+        - create a public IP for yourself, which will be available for us always
+        - it is paid
+
+- S3
+    - Scalable Storage Service
+    - provides "unlimited" cloud storage
+    - create bucket
+    - create object, add files, add folders etc.
+    - changing the permissions to make it accessible
+        - go to the permissions of the bucket first
+        - go to the block public access -> edit -> uncheck and save
+        - scroll down, go to object ownership -> edit -> enable ACLs
+        - go to the permissions of the object, and give read permissions to the the public etc.
+    - we will be able to access the object with the url specified there
+    - we need to edit the policy too
+        - go to permissions of the bucket
+        - scroll down to bucket policy
+        - edit
+        - policy generator
+        - policy type -> s3 bucket
+        - principal -> *
+        - getObject
+        - paste the arn from any object and add /*
+        - generate
+        - copy
+        - paste it to previous page where we clicked policy generator
+        - save and done
+    
+- Lambda
+    - serverless functions -> if we want to execute some heavy functions (not neccessarily heavy) outside of our server
+        as it is consuming a lot of our server, we deploy them on separate platform (called lambda in aws)
+    - languages supported in lambda
+        - Node
+        - Python
+        - Java 8+
+        - C# .net core
+        - Golang
+        - Ruby
+        - Rust (beta version)
+    - go to service -> lambda -> functions -> create function
+    - four options while creating
+        - author from scratch -> start from scratch
+        - use a blueprint -> create from already created functions
+        - container image
+        - Browse serverless app repositry -> some repos are already made, use them if you want to
+    - create a functon, give name, and the language version (in author from scratch)
+    - find the blueprint, and start working with it
+    - function created
+    - there will be a code written already if nlueprint is chosen (here we are choosing blueprint)
+    - make changes
+    - "Test" it, craete test event
+    - test and the code will run
+    - "Deploy" to save the changes made to the function
+    - in configuration tab
+        - there are various configs available
+        - function url- new
+            - to create a url for the function to make it accessible publicaly
+    - in monitor tab
+        - go to logs to see the logs of the function
+    
+    - the function:-
+        console.log('Loading function');
+
+        exports.handler = async (event, context) => {
+            return{
+                "statusCode" :200,
+                "body": "This is another Nodejs function, changes made",
+                "header":{
+                    "Content-Type":"application/json"
+                }
+            }
+        };
+
+
+    - Limitations of Lambda
+        - memory can be 128mb to 10gb
+        - Max execution time- 15minutes (900 seconds)
+        - max size of environment varaibles - 4kb
+        - disk capacity - /tml - 512 mb
+        - function can execute 1000 process concurrently
+
+- DynamoDB
+    - NoSQL database like MongoDB
+    - create table and give name and partition key
+    - keep the default settings
+    - and create table
+    - we can use all the filters and tables searching options making it easier to iterate the table
+
+- API Gateway
+    - creating APIs (may types REST, HTTP etc)
+    - we link a lambda function with it
+    - can create resource, the url endpoint
+    - can create methods for resource -> get/put/post etc
+    - can create stages, to test the API
+    - enable CORS
+
+- CloudWatch
+    - used to watch over all the functionalities of our AWS, ranging from billing, ec2 instances, lambda fucntions etc
+    - can create alarms, i.e. when certain thing happens we will recieve notification on mail or anything of our choice
+    - we have to select the metric on which we want to apply the alarm
+    - apply desrired conditions and the SNS topic
+    - can create log groups to view the logs for various services
+    - can create event rules, if we want to get some event happened
+    - can create schedules, to automate something to happen after fixed interval of time
+
+- Route 53
+    - Domain registration and management system
+    - creating records, create two records 
+        - if domain is abc.com
+        - then records will be 
+            - www.abc.com
+            - abc.com
+        - link both of them with the server ip address
+    - open the ec2 isntance from the terminal 
+    - sudo apt-get install apache2
+    - go to /etc/www
+    - index.html will be there, if not create one
+    - whatever will be there in the file, will be displayed on the webpage
+
+- IAM
+    - managing access to AWS resources
+    - creating roles and users and granting them roles
+    - create password based user
+
+- RDS
+    - Relational Database System
+    - craete various databases from the AWS

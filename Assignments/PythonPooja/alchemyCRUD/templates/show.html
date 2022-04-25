@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>
+            Show List
+        </title>
+    </head>
+    <body>
+        <h3>Student <a href="/new">Add Student</a></h3>
+        <table border="2">
+            <thead>
+                <tr>Name</tr>
+                <tr>City</tr>
+                <tr>Actions</tr>
+            </thead>
+            <tbody>
+                {% for s in student %}
+                <tr>
+                    <td>{{s.name}}</td>
+                    <td>{{s.city}}</td>
+                    <td>
+                        <a href="/edit/{{s.id}}">Edit</a>
+                        <a href="/delete/{{s.id}}">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </body>
+</html>

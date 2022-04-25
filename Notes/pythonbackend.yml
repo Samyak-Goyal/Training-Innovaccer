@@ -1,0 +1,1020 @@
+- Database Connections in Python
+    - steps to follow
+        - connect to database
+        - create a cursor
+            - cursors are like pointer to rows in the database
+        - write a query
+        - commit changes
+        - close the connection
+
+    - sqlite3
+        - data types
+            - integer 
+            - text
+            - boolean
+        
+        - steps
+            import sqlite3
+            # connection created
+            conn = sqlite3.connect('lite.db')
+            # cursor created
+            cur = conn.cursor()
+            cur.execute("CREATE TABLE if not exists store(item TEXT,quantity INTEGER, price REAL)")
+            cur.execute("INSERT INTO store VALUES('books',10, 100.70)")
+            # changes made here will be submitted to the database by
+            conn.commit()
+            # close the connection
+            conn.close()
+
+        - cursor methods
+            - fetchOne()
+            - fetchAll()
+            - fetchMany(<no of records>)
+        
+        - it has all the queries same as MySql
+        - if we want to insert some dynamic value in the query then we do like
+            
+            cur.execute("INSERT INTO store VALUES(?,?,?)", (item, quantity, price))
+            
+            OR (another example)
+
+            def delete(lastname):
+                conn = sqlite3.connect('assign.db')
+                cur = conn.cursor()
+                cur.execute("DELETE FROM customer where lastname=?", (lastname,)) ###
+                conn.commit()
+                conn.close()
+            
+            --> in execute we are using ? to let it know that we are to insert dynamic value in it
+            --> we have inserted a , after lastname to make it understand that lastname is a single value
+            --> otherwise it consider it as a tuple and the character in its value as separate values
+
+    - Postgres
+        - install psycopg2 package
+            -   
+                sudo apt-get update
+                sudo apt-get install libpq-dev python-dev
+                sudo pip install psycopg2
+        - in .py file 
+            - import psycopg2
+            - # to create connection
+            conn = psycopg2.connect("dbname='python_test' user = 'dakshbindal' password='123' host='localhost' port ='5432'")
+
+            --> dbname is the name of the database we created in pgadmin4 (create manually)
+            --> user and password of the pgadmin4
+            --> port if 5432 by default of pgadmin4, and we are using it too
+        
+        - everything else is same as that in sqlite3
+        - instead of ? that we used in sqlite, we use %s here
+
+    - Alchemy
+        - it helps create a databse, without writing the queries
+        - just write python code and it will create the db by itself
+        - create a virtual environment for this
+            - virtual environment is created to make the changes in that evironment only, not everywhere
+            - pip install virtualenv
+            - virtualenv venv
+                - venv is the name of our virtual environment
+            - source venv/bin/activate 
+                - to start the venv
+            - pip install sqlalchemy
+            - pip freeze > requirement.txt 
+                - this command is used to get all the requirement needed for our project
+        
+        - alchemy code
+            from sqlalchemy import create_engine, Column, Integer, String
+            from sqlalchemy.ext.declarative import declarative_base
+            from sqlalchemy.orm import sessionmaker
+
+            engine = create_engine('sqlite:///final.db', echo=True)
+            # create_engine('postgresql:///dakshbindal:123@localhost:5432/python_test') --> for postgres
+            Session = sessionmaker(bind=engine) # used
+            session = Session()
+            Base = declarative_base()
+
+
+            class User(Base):
+                __tablename__ = 'users'
+                id = Column(Integer, primary_key=True)
+                name = Column(String)
+                fullname = Column(String)
+                lastname = Column(String)
+
+                def __repr__(self):
+                    return "<User(name='%s', fullname='%s', lastname='%s')>" % (self.name, self.fullname, self.lastname)
+
+
+            if __name__ == '__main__':
+                Base.metadata.create_all(engine) #to create the enginer whenever this file is run (or imported somewhere else)
+
+            user_a = User(name="hello", fullname="Daksh", lastname="Bindal") # creating data
+            session.add(user_a) # adding data
+            session.commit() # final push
+
+            --> session is used to add data into the database
+            --> session.new can be used to see the data which is yet to pushed
+            --> session.commit() for final push in the database
+            --> in Base class we declare all our tables etc
+            --> session.query(models.User).all() -> gives all the data
+            --> .count() --> gives total no of records
+            --> .first() --> first result
+            --> get(primary_key)
+            --> limit()
+            --> order_by
+            --> session.query(User.name).filter(User.id==id) --> displays the name column of the matching id 
+            --> session.query(User).filter(User.name == 'hello').all() --> show specific users with name hello
+            --> User.name.ilike('P%') --> name starting with P but using ilike making is not case sensitive
+            --> order_by(desc/asc<parameter>)
+                print(session.query(User).order_by(desc(User.id)).all())
+            --> models.session.query(models.User).filter(models.User.id==3).update({"name":"Another"}, synchronize_session='fetch')
+                - synchronize_session -> synchronizes the output and everything
+                    - fetch -> return the primary key of the row that was affected
+                    - false -> is another one
+                    - evaluate -> evaluates the where criteria and then try to find out the matching session
+            --> i= session.query(models.User).get(id)
+                i.lastname="xxx"
+                session.commit()
+
+                --> update alternate
+            --> i= session.query(models.User).get(id)
+                session.delete(i)
+                session.commit()
+
+                --> delete alteranate (one way is to write the long command with synchronize and all)
+    
+    - tkinter project
+        - for frontend of desktop apps
+        - book management portal
+        - sqlite is used
+        - two files, backend and frontend
+        - see the github
+
+- Web
+    - Flask
+        - virtualenv venv
+        - source venv/bin/activate
+        - pip install flask
+        - hello.py --> flask example
+
+            from flask import Flask, redirect, url_for, request
+            app = Flask(__name__) # default, the application name of the flask
+
+            #writing the route and followed by a function defining what to do at the route
+            @app.route("/hello/<name>")  # two parameters (rule, options)
+            def hello_world(name):
+                return "Hello %s" % name # taking the argument from url and then displaying it
+
+
+            @app.route("/post/<int:postid>")
+            def hello_post(postid):
+                return "Hello %d" % postid
+
+
+            @app.route('/admin')
+            def hello_admin():
+                return "hello admin"
+
+
+            @app.route("/guest/<guest>")
+            def hello_guest(guest):
+                return "hello %s as guest" % guest
+
+
+            @app.route('/user/<name>')
+            def hello_user(name):
+                if name == 'admin':
+                    return redirect(url_for('hello_admin')) # redirecting to another function if certain condition is met
+                    # in url_for,we mention the function name, not the path 
+                else:
+                    return redirect(url_for('hello_guest', guest=name)) # passing the argument to the function
+            # app.add_url_rule('/', view_func=hello_world) --> another way to call the function
+            
+
+            # handling the api calls made from a html file (frontend)
+            # method is assigned in the form tag
+            # in action of the form, mention the url, here it is 127.0.0.1:<port>/login
+            @app.route('/login', methods=['POST','GET'])
+            def login():
+                if request.method == 'POST': # if the request is port ('request' is imported)
+                    user = request.form['nm'] # nm is the name attribute in the input tag
+                    return redirect(url_for('success', name=user))
+                else:
+                    user= request.args.get('nm') # get request, we type the argument in the url after /success/
+                    return redirect(url_for('success', name=user))
+
+            @app.route('/success/<name>')
+            def success(name):
+                return 'Welcome %s' %name 
+
+            if __name__ == '__main__': # default to run the flask application
+                app.run( debug=True, host ='127.0.0.1', port=8000) # defualt port is 5000, we can change the port like this
+
+        - login.html --> frontend
+            <!DOCTYPE html>
+            <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+            </head>
+
+            <body>
+                <form action="http://127.0.0.1:8000/login" method="post"> # redirecting to the url on submit
+                    <p>Enter Name</p>
+                    <p><input type="text" name="nm" id="nm" /></p>
+                    <p><input type="submit" value="submit" /></p>
+                </form>
+            </body>
+
+            </html>
+        
+        - above we have shown to go to .py from .html
+        - to render html from .py  
+            from flask import Flask, render_template
+            app= Flask(__name__)
+
+            @app.route('/hello/<user>')
+            def index(user):
+                # return '<html><body><h1>Hello User</h1></body></html>' --> one way to display the data, ewww
+                return render_template('hello.html', name=user) # rendering
+
+            if __name__ == '__main__':
+                app.run(debug=True)
+            
+            --> create template folder and then create the html files there you wish to render
+            --> render_template, by default accesses the template folder and search the file in it
+            --> we are passing argument to the html call 
+        
+            - hello.html files
+                <body>
+                    <h1>Hello user {{name}}</h1> # accessed usign {{}}
+                </body>
+
+                </html>
+
+                # <!-- {#
+                # {% %} -> for statements
+                # {{ }} -> for expressions #} -->
+                # <!--
+                #      {# #} -> for comments --> use {##} if rendering somewhere
+                #  -->
+
+        - cookiesData.py
+            from flask import Flask, render_template, request, make_response
+            app = Flask(__name__)
+
+
+            @app.route('/')
+            def index():
+                return render_template('main.html')
+
+
+            @app.route('/setcookie', methods=['POST'])
+            def setCookie():
+                if request.method == 'POST':
+                    user = request.form['userid']
+                    resp = make_response(render_template('readcookie.html'))
+                    resp.set_cookie('userid', user)
+                    return resp
+
+
+            @app.route('/getcookie')
+            def getCookie():
+                userid = request.cookies.get('userid')
+                return '<h1>Cookie found: ' + userid + '</h1>'
+
+
+            if __name__ == "__main__":
+                app.run(debug=True, host='127.0.0.1', port='8080') # changing the port of the flask application
+
+            --> make_response -> to get what html is displaying
+            --> set_cookie is inbuilt function
+            --> request.cookies -> also inbuilt function
+        
+        - upload.py
+            from flask import Flask, render_template, request
+            app = Flask(__name__)
+
+
+            @app.route('/')
+            def upload():
+                return render_template('upload.html')
+
+
+            @app.route('/success', methods=['POST'])
+            def success():
+                if request.method == 'POST':
+                    fileData = request.files['file']
+                    fileData.save(fileData.filename)
+                    return render_template('success.html', name=fileData.filename)
+
+
+            if __name__ == '__main__':
+                app.run(debug=True)
+
+            --> .filename is inbuilt
+        - upload.html
+            <body>
+                <form action="/success" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" /> # for uploading file
+                    <input type="submit" value="submit" />
+                </form>
+            </body>
+            </html>
+        
+        - flask with database (sqlite)
+            - employeedb.py --> to create the database
+                import sqlite3
+
+                con = sqlite3.connect('employee.db')
+                print('Databse Connected')
+                cur = con.cursor()
+                cur.execute(
+                    'CREATE TABLE Employees(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, address TEXT)')
+                con.commit()
+                con.close()
+            
+            - routes.py
+                from flask import Flask, make_response, render_template, request, redirect, url_for
+                import sqlite3
+                app = Flask(__name__)
+
+
+                @app.route('/')
+                def index():
+                    return render_template('index.html')
+
+
+                @app.route('/add')
+                def add():
+                    return render_template('add.html')
+
+
+                @app.route('/savedetails', methods=['POST'])
+                def saveDetails():
+                    msg = 'msg'
+                    if request.method == 'POST':
+                        name = request.form['name']  # getting the details from post method
+                        email = request.form['email']
+                        address = request.form['address']
+                        with sqlite3.connect('employee.db') as con:
+                            cur = con.cursor()
+                            cur.execute('INSERT INTO Employees values(NULL,?,?,?)',
+                                        (name, email, address))
+                            con.commit()
+                            msg = 'DATA added successfully'
+                            # con.close()
+                            return render_template('success.html', msg=msg)
+
+
+                @app.route('/view')
+                def view():
+                    con = sqlite3.connect('employee.db')
+                    cur = con.cursor()
+                    cur.execute("SELECT * FROM Employees")
+                    rows = cur.fetchall()
+                    con.close()
+                    return render_template('view.html', rows=rows)
+
+
+                @app.route('/delete/<int:id>')
+                def delete(id):
+                    con = sqlite3.connect('employee.db')
+                    cur = con.cursor()
+                    cur.execute('DELETE FROM Employees where id=?', (id,))
+                    con.commit()
+                    con.close()
+                    return redirect(url_for('view'))
+
+
+                @app.route('/edit/<int:id>')
+                def edit(id):
+                    con = sqlite3.connect('employee.db')
+                    cur = con.cursor()
+                    cur.execute("SELECT * FROM Employees where id= ?", (id,))
+                    rows = cur.fetchall()
+                    con.close()
+                    return render_template('edit.html', rows=rows)
+
+
+                @app.route('/updatedetails/<int:id>', methods=['POST'])
+                def update(id):
+                    msg = 'msg'
+                    if request.method == 'POST':
+                        name = request.form['name']
+                        email = request.form['email']
+                        address = request.form['address']
+                        with sqlite3.connect('employee.db') as con:
+                            cur = con.cursor()
+                            cur.execute(
+                                'UPDATE Employees set name=?, email=?, address=? where id=?', (name, email, address, id))
+                            con.commit()
+                            msg = 'DATA changed successfully'
+                            # con.close()
+                            return render_template('success.html', msg=msg)
+
+
+                @app.route('/deletehome')
+                def deletehome():
+                    return render_template('delete.html')
+                    # list = make_response(redirect(url_for('view')))
+                    # delete= make_response(render_template('delete.html'))
+                    # return list+delete
+
+
+                @app.route('/deletedetails', methods=['POST'])
+                def deleteDetails():
+                    msg = 'msg'
+                    if request.method == 'POST':
+                        name = request.form['name']
+                        email = request.form['email']
+                        address = request.form['address']
+                        with sqlite3.connect('employee.db') as con:
+                            cur = con.cursor()
+                            cur.execute(
+                                'DELETE FROM Employees where name=? AND email=? AND address=?', (name, email, address))
+                            con.commit()
+                            msg = 'User Deleted Successfully'
+                            # con.close()
+                            return render_template('success.html', msg=msg)
+
+
+                if __name__ == '__main__':
+                    app.run(debug=True)
+
+            - view.html
+                <!DOCTYPE html>
+                <html lang="en">
+
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>List Page</title>
+                </head>
+
+                <body>
+                    <h3>Employee List</h3>
+                    <table border="1">
+                        <thead>
+                            <td>Id</td>
+                            <td>Name</td>
+                            <td>Email</td>
+                            <td>Address</td>
+                            <td>Action</td>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %} # for loop
+                            <tr>
+                                <td>
+                                    {{row[0]}} #rows is a tuple, so using indexes 0 -> id
+                                </td>
+                                <td>
+                                    {{row[1]}}
+                                </td>
+                                <td>
+                                    {{row[2]}}
+                                </td>
+                                <td>
+                                    {{row[3]}}
+                                </td>
+                                <td>
+                                    <a href="/delete/{{row[0]}}">Delete</a>
+                                    <a href="/edit/{{row[0]}}">Edit</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <br>
+                    <a href="/">Go to Home</a>
+                </body>
+
+                </html>
+            
+            - edit.html
+                <!DOCTYPE html>
+                <html lang="en">
+
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Edit Page</title>
+                </head>
+
+                <body>
+                    <h2>Employee information</h2>
+
+                    <form action="/updatedetails/{{rows[0][0]}}" method="post"> #passing the key
+                        <table>
+                            <tr>
+                                <td>
+                                    Name
+                                </td>
+                                <td>
+                                    <input type="text" name="name" value={{rows[0][1]}}> #value gives prefilled data in there
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Email
+                                </td>
+                                <td>
+                                    <input type="email" name="email" value={{rows[0][2]}}>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Address
+                                </td>
+                                <td>
+                                    <input type="text" name="address" value={{rows[0][3]}}>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="submit" value="submit" />
+                                </td>
+
+                            </tr>
+                        </table>
+                    </form>
+                </body>
+
+                </html>
+            
+            - add.html 
+                <body>
+                    <h2>Employee information</h2>
+                    <form action="/savedetails" method="post">
+                        <table>
+                            <tr>
+                                <td>
+                                    Name
+                                </td>
+                                <td>
+                                    <input type="text" name="name">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Email
+                                </td>
+                                <td>
+                                    <input type="email" name="email">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Address
+                                </td>
+                                <td>
+                                    <input type="text" name="address">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="submit" value="submit" />
+                                </td>
+
+                            </tr>
+                        </table>
+                    </form>
+                </body>
+
+                --> here a nice way of form creation is show, creatign a table for even spacing
+        
+        - flask with database (with Alchemy)
+            - pip install flask-sqlalchemy
+            - router.py
+                from flask_sqlalchemy import SQLAlchemy # imports
+                from flask import Flask, render_template, redirect, url_for, request
+                app = Flask(__name__)
+
+                app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3' #uri connection
+
+                db = SQLAlchemy(app) #app binding
+
+
+                class students(db.Model):  # classname is the name of the table (here, students)
+                    id = db.Column(db.Integer, primary_key=True)
+                    name = db.Column(db.String(100))
+                    city = db.Column(db.String(50))
+
+                    def __init__(self, name, city): #constructor
+                        self.name = name
+                        self.city = city
+
+
+                @app.route('/')
+                def show_all():
+                    return render_template('show.html', student= students.query.all()) #student hold data of each and every student
+
+
+                @app.route('/createdb') # only visit the path to create the database
+                def create():
+                    db.create_all()  # creating the database, equivalent to Base.metadata.create_all(engine) which we did in alchemy
+                    return redirect(url_for('show_all'))
+
+                @app.route('/new', methods=['POST', 'GET'])
+                def new_student():
+                    if request.method == 'POST':
+                        name= request.form['name']
+                        city=request.form['city']
+                        newstudent= students(name, city)
+                        db.session.add(newstudent)
+                        db.session.commit()
+                        return redirect(url_for('show_all'))
+                    return render_template('new.html')
+
+                @app.route('/edit/<int:sid>', methods=['POST', 'GET'])
+                def edit_student(sid):
+                    # if request.method=='POST':
+                    item = students.query.filter_by(id = sid)
+                    name=students.query(name).filter_by(id = sid)
+                    city= students.query(city).filter_by(id = sid)
+                    return render_template('edit.html', name=name, city=city)
+
+                @app.route('/delete/<int:sid>')
+                def delete_student(sid):
+                    students.query.filter_by(id=sid).delete()
+                    db.session.commit()
+                    return redirect(url_for('show_all'))
+
+                if __name__ == '__main__':
+                    # db.create_all() --> can be done here too
+                    app.run(debug=True)
+
+            - show.html
+                <!DOCTYPE html>
+                <html lang="en">
+
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Show List</title>
+                </head>
+
+                <body>
+                    <h2>Student </h2>
+                    <h4><a href="/new">Add Student</a></h4>
+                    <table border="1">
+                        <thead>
+                            <th>Name</th>
+                            <th>City</th>
+                            <th>Actions</th>
+                        </thead>
+                        <tbody>
+                            {% for s in student %}
+                            <tr>
+                                <td>{{s.name}}</td>
+                                <td>{{s.city}}</td>
+                                <td>
+                                    <a href="/edit/{{s.id}}">Edit</a>
+                                    <a href="/delete/{{s.id}}">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </body>
+
+                </html>
+            
+        - REST APIs with Flask
+            - pip install flask-restful
+            - pip install requests
+            - pip install flask-sqlalchemy
+            - main.py --> server side file (which will allow the API calls)
+                from flask import Flask, request
+                #imports from flask-restful
+                from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with  # rest api
+                from flask_sqlalchemy import SQLAlchemy
+
+                app = Flask(__name__)
+                api = Api(app)  # binding the app inside the api
+                app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db' #database uri
+                db=SQLAlchemy(app)
+
+                class ViewModel(db.Model): #creating the table, the table name in the datbase would be view_model, but we will use ViewModel
+                    id=db.Column(db.Integer, primary_key=True)
+                    name=db.Column(db.String(100))
+                    views=db.Column(db.Integer)
+                    likes=db.Column(db.Integer)
+
+                # db.create_all() #uncomment to create the database
+
+                video_put_args = reqparse.RequestParser()  # to parse the request we are sending
+                video_put_args.add_argument(    # adding arguments in the request we would be passing
+                    'name', type=str, help="name of the video", location='form')
+                video_put_args.add_argument(
+                    'likes', type=int, help="Likes on the video", location='form')
+                video_put_args.add_argument(
+                    'views', type=int, help="view of the video", location='form')
+
+                resource_fields={ # used to get a strucutred data from the database (mind the imports)
+                    'id':fields.Integer,
+                    'name':fields.String,
+                    'likes':fields.Integer,
+                    'views':fields.Integer
+                }
+
+                videos = {}
+                names = {'jess': {'age': 10, 'gender': 'female'}, #dictionary
+                        'bill': {'age': 56, 'gender': 'male'}}
+
+               
+
+                # will stop the current call if the video with mentioned id doesn't exists
+                def abort_video_not_exists(video_id):
+                    if video_id not in videos:
+                        abort(404, message='Not found')
+
+                # will stop the current query if                 def abort_if_
+                :
+                    if video_id in videos:
+                        abort(404, message='already added')
+
+                # get,post,put,patch,delete
+                class HelloWorld(Resource):
+                    def get(self, name):  # get method from Resource class, here it is overriding
+                        # necessary to return dict or string, no other type
+                        return names[name]
+
+                    def post(self):  # post method
+                        return {'data': 'postrequest'}
+
+
+                class Video(Resource):
+                    @marshal_with(resource_fields) # to make the structured insertion and deletion of the data
+                    def get(self, video_id):
+                        # abort_video_not_exists(video_id)
+                        result=ViewModel.query.filter_by(id=video_id).first() #getting the video details from the database
+                        if not result:
+                            abort(404,message='Not found')
+                        return result
+
+                    @marshal_with(resource_fields)
+                    def put(self, video_id):
+                        # abort_if_exists(video_id)
+                        args = video_put_args.parse_args() # the arguments are resolved which are put from the API call from client side
+                        video= ViewModel(name=args['name'], views=args['views'], likes=args['likes']) #insertion in the database
+                        db.session.add(video)
+                        db.session.commit()
+                        # videos[video_id] = args
+                        return video
+
+                    # delete from the database
+                    def delete(self,video_id):
+                        abort_video_not_exists(video_id)
+                        del videos[video_id]
+                        return '',204
+
+                
+
+                # multiple endpoints
+                # api.add_resource(HelloWorld,'/helloworld', '/world') # making it accessible to others, helloworld is the endpoint
+                # passing data to the get request
+                api.add_resource(HelloWorld, '/helloworld/<string:name>')
+                api.add_resource(Video, '/video/<int:video_id>')
+
+                # print(videos)
+                if __name__ == '__main__':
+                    app.run(debug=True)
+
+            - test.py --> the program initiating the api calls
+                import requests
+
+                BASE = 'http://127.0.0.1:5000/'  # base url of the server api
+
+                data=[
+                    {'likes':100,'views':50,'name':'title1'},
+                    {'likes':1000,'views':5000,'name':'title2'},
+                    {'likes':20,'views':50,'name':'title3'},
+                ]
+
+                # PUT THE DATA FROM THE ARRAY 'data'
+                # for i in range(len(data)):
+                #     response= requests.put(BASE+'video/'+str(i), data[i])
+                #     print(response.json())
+
+                # GET THE DATA FROM THE helloworld endpoint OF THE PERSON BILL
+                # response = requests.get(BASE+'helloworld/bill')
+                # print(response.json())
+
+                # ACCESSING THE ENDPOINT
+                # response = requests.post(BASE+'world') # accessing the endpoint
+                # print(response.json())
+
+                # response = requests.put(BASE+'video/1',{'name':'name','likes':10,'views':100}) #entering the data
+                # print(response.json())
+
+                # input()
+                # response = requests.put(BASE+'video/1',{'name':'name','likes':10,'views':100}) #entering the data
+                # print(response.json())
+
+                # input()
+
+                # getting the data at id=10 (abort function because no data at 10)
+                # response = requests.get(BASE+'video/10')
+                # print(response.json())
+
+                # DELETE METHOD
+                # response = requests.delete(BASE+'video/1') 
+                # print(response)
+                # input()
+
+                # response = requests.get(BASE+'video/1') # getting the data at id=1
+                # print(response.json())
+
+    - Django
+        - pip install Django
+        - djangop-admin createproject <projectname> --> to create the project
+        - python3 manage.py runserver --> to start the server (on 8000 port by default)
+        - python3 manage.py createsuperuser --> to create a user with admin level permissions
+        - python3 manage.py makemigrations --> do this when a new database is created, or any change in any database is made
+        - python3 manage.py migrate --> to make the migration in the database
+        - python3 manage.py startapp <appname> --> app are functionalities of the project
+        - App createad named blog
+        - list the app in the settings.py of project
+        - create a folder named templates in the django folder (outside the project/app folder)
+        - in settings.py of folder
+            - import os
+            - in TEMPLATE array
+                DIRS=[os.path.join(BASE_DFIR,'templates')] #write this
+        - urls.py of the project (here, mysite)
+            from django.contrib import admin
+            from django.urls import path, include
+
+            urlpatterns = [
+                path('admin/', admin.site.urls), # for the admin panel
+                path('', include('blog.urls')), # directing to our app
+            ]
+        - in Blog
+            - models.py 
+                from django.db import models
+                from django.contrib.auth.models import User # importing table named User from the database
+                # Create your models here.
+                # models create database fields
+                # views converts model properties to templates
+
+                STATUS = (
+                    (0, 'Draft'),
+                    (1, 'Publish')
+                )
+
+
+                class Post(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    date = models.DateTimeField(auto_now_add=True) # adds the current date
+                    slug = models.SlugField(max_length=200, unique=True) # slugs are kind of the endpoints we discussed in RESTapi
+                    author = models.ForeignKey(to=User, on_delete=models.CASCADE) # foreign key established, on_delete means delete the column also when the target foreign key is also deleted
+                    status = models.IntegerField(choices=STATUS, default=0)
+
+                        def __str__(self):
+                            return self.title
+
+                --> models.py is responsible for the database handling
+                --> also for the admin/ panel
+                --> slug is like an identifier for the view (discussed later)
+                --> __str__ --> function to name the entry correctly in the admin panel
+
+            - admin panel
+                - we can basically do everything about our data (models) from the admin panel    
+                - login with the credentials of superuser we created
+
+            - admin.py
+                from django.contrib import admin
+                from .models import Post #importing the model
+
+                # Register your models here.
+
+                class PostAdmin(admin.ModelAdmin):
+                    list_display=('title','date','author') # fields to display at the model in admin panel
+
+                admin.site.register(Post, PostAdmin) #registering the model
+
+            - urls.py 
+                from . import views
+                from django.urls import path
+                from django.contrib import admin
+
+                urlpatterns =[
+                    # path('about', views.AboutView.as_view(), name='about_view'),
+                    
+                    path('',views.HomeView.as_view(), name='home_view'),
+                    path('about/', views.AboutView.as_view(), name='about_view'),
+                    path('<slug:slug>', views.BlogView.as_view(), name='blog_view'),
+                    path('transfer/', views.transfer_data, name='transfer_view')
+                ]
+
+                # changing the text of the django admin panel
+                admin.site.site_header = "Mysite Admin" 
+                admin.site.site_title = "Mysite Admin Portal"
+                admin.site.index_title = "hello"
+
+                --> path('<route>', views.<name_of_the_view>, name='alias')
+                    - the alias will be used as url if we want to get this view from any template
+                --> about/ -> / after about becuase in the later part we are accessing <slug:slug> and if we enter about only
+                    without any /, it will consider it as an slug, and will thorw error if there is no such entry corresponding to that slug
+                --> path('<slug:slug>', views.BlogView.as_view(), name='blog_view'),
+                    - slug:slug --> first slug is identifier, second slug is the slug value we want to get
+                    - as_view() takes the slug argument and initiates the view
+            
+            - view.py
+                from django.shortcuts import render
+                from .models import Post
+                from django.views import generic # to facilitate the data handling
+                # Create your views here.
+
+                class BlogView(generic.DetailView): #detailview for the view of the data corresponding to that slug entry
+                    model=Post # name of the model , 'model' keyword is inbuilt
+                    template_name='blog.html' # name of the template to render (also inbuilt)
+
+                class HomeView(generic.ListView): #listview for the data from the database
+                    queryset=Post.objects.filter(status=1) # query to get data (sqeryset keyword is inbuilt)
+                    template_name='index.html' # queryset keyword send data in the template in the array of object named <model_name>_list, here it would be post_list
+
+
+                class AboutView(generic.TemplateView): # templateview for the rendering of static data
+                    template_name='about.html'
+
+                def transfer_data(request): # for handling input data from form
+                    if request.method =='Post':
+                            return True
+                    return render(request, 'transfer.html')
+            
+            - templates
+                - we will be creating a base html file, named base.html (not neccessary to be the same name), and in it
+                    we will put the content which we want to display on more than one pages, so we dont have to write it again and can just 
+                    extend the base file and insert out content into the block
+                - base.html
+                    <!DOCTYPE html>
+                    <html lang="en">
+
+                    <head>
+
+                        <title>List</title>
+                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+                            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+                    </head>
+
+                    <body>
+                        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="mainNav">
+                            <div class="collapse navbar-collapse" id="navbarResponsive">
+                                <ul class="navbar-nav ml-auto">
+                                    <li class="nav-item"><a href="{% url 'home_view' %}" class="navbar-brand p-3">Home</a></li>
+                                    <li class="nav-item"><a href="{% url 'about_view'%}" class="navbar-brand p-3">About</a></li>
+                                </ul>
+                            </div>
+                        </nav>
+                        {% block content%}{% endblock content%}
+                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+                            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+                            crossorigin="anonymous"></script>
+                    </body>
+
+                    </html>
+
+                    --> link tag in the head tag contains the link for the bootstrap CSS
+                    --> script tag in body tags contain the bootstrap css
+                    --> block content and endblock content specifies the area in which our content will be inserted
+                
+                - index.html   
+                    {% extends 'base.html'%} #extending the base.html
+                    {% block content %}
+
+                    <div class="container">
+                            {% for post in post_list %} # note the <model_name>_list
+                            <div class="card m-3">
+                                <div class="card-body">
+                                    <h2 class="card-title"> {{post.title}} </h2>
+                                    <p class="card-text">{{post.content}}</p>
+                                    <p class="card-text">Author: {{post.author}}</p>
+                                    <a href="{%url 'blog_view' post.slug%}" class="btn btn-primary">Read more</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                    </div>
+                    {% endblock content%}
+                
+                - blog.html (getting the slug)
+                    <!DOCTYPE html>
+                    <html lang="en">
+
+                    <head>
+                        <title>Blog</title>
+                    </head>
+
+                    <body> # object is the slug data we are getting (object is inbuilt name)
+                        <h1>{{object.title}}</h1>
+                        <p>{{object.content}}</p>
+                        <p>{{object.author}}</p>
+                    </body>
+
+                    </html>

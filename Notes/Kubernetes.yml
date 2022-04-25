@@ -1,0 +1,152 @@
+KUBERNETES (K8)
+    - it is by google
+    - not a replacement for Docker
+    - it manages the container
+    - Cluster --have--> nodes --have--> PODs --have--> containers
+    - POD --> container wrapper
+    - container --> container by Docker
+    - node --> Host machine
+    - Cluster -> collection of nodes
+    - master node is there to connect all the machines, and in this machine K8 is running
+    - master node is also a part of cluster
+    - software required
+        - Docker
+        - kubelet (Command Line Interface)
+            - uses kubelet-proxy which provides network communication service
+    - installation
+        - Docker
+        - kubectl -> interating with k8
+            - https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/ 
+        - minikube -> used to make nodes in k8 (will not work in production)
+            - makes various virtual machine on a single physical machine available
+            - https://minikube.sigs.k8s.io/docs/start/
+            - minikube use drivers while making clusters
+            - drivers means virtual machines 
+            - example of drivers
+                - Docker, KVM2, VirtualBox, Podman, None (bare-metal), SSH
+    - starting
+        - as we have docker installed as driver
+        - sudo usermod -aG docker $USER && newgrp docker
+        - minikube start --driver=docker
+        - minikube can install only one engine, if we want to start new engine then we have to delete
+            the previously created engines using
+            - minikube delete --all
+    - commands
+        - minikube status --> to check the status of minikube
+        - kubectl cluster-info --> to check the status of kubectl
+    
+    - everything is object
+        - pods, deployments, services, volume, network etc.
+
+        - pod
+            - pod will run inside a node
+            - pod contains the containers
+            - usually, 1 pod contains 1 container
+            - it has cluster IP (internal)
+            - pods are ephemeral, i.e. pods are temporary, and kubectl add/remove PODS on run time based on the load/traffic/requirement
+            - to manage pods controller is required e.g. deployment object
+
+        - deployment
+            - it controls the pod
+            - you can set your desire, k8 will change the state using deployment
+            - it defines that which POD and container to run and how much no of instances
+            - deployment is scalable
+            - we dont directly deal with pods, but deployment setup the pods
+        
+        - services
+            - helps to establish a network link with pods/server/local machine
+
+    - demo (imperative approach)
+        - imperative approach means doing everything with commands
+        - npm init
+        - npm install express body-parser
+
+        - create app.js
+            const express = require('express');
+            const app = express();
+            app.get('/', (req, res) => {
+                res.send(` <h1>Hello from this NodeJS app!</h1>
+                <p>Try sending a request to /error and see what happens</p> `);
+            }); 
+            app.get('/error', (req, res) => { 
+              process.exit(1); 
+            }); 
+            app.listen(8080); 
+
+        - create dockerfile
+            FROM node:14-alpine 
+            WORKDIR /app 
+            COPY package.json . 
+            RUN npm install 
+            COPY . . 
+            EXPOSE 8080 
+            CMD ["node", "app.js"] 
+
+        - build the image
+        - push the image to docker hub
+            - https://hub.docker.com/r/samyakinnovaccer/kube-first-app
+        - kubectl create deployment first-app --image samyakinnovaccer/kube-first-app:1.0 --> creating new deployment with docker hub repo
+            - first-app is the name of deployment that we are creating
+            - this will create a deployment and pods
+        - kubectl get deployments --> list all the deployments
+        - kubectl get pods --> list all the pods
+        - minikube dashboard --> check the web based status, it is in detail
+        - kubectl delete deployment <deployment_name> --> to delete that deployment
+        - create the service to access the pod's application using load balancing tech using the command
+            - kubectl expose deployment first-app --port=8080 --type=LoadBalancer
+                - the port is the one we exposed in dockerfile as in app.js
+            - minikube service first-app --url
+                - gives the url for the service               
+        - kubectl scale deployment/first-app --replicas=3 --> scaling the infrasturcute, replicas means make total 3 pods
+        - update the image
+          - modify the source code
+          - docker build -t samyakinnovaccer/kube-first-app:2.0 .
+          - push to docker hub
+          - kubectl set image deployment/first-app kube-first-app=samyakinnovaccer/kube-first-app:2.0 -> to update the image
+            - kube-first-app is the name of the container
+              - find it by -> kubectl describe deployments
+          - kubectl rollout status deployment/first-app
+        
+    - demo (declarative approach)
+        - creating .yaml files instead of writitng commands
+        - for deployment
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+                name: second-app-deployment
+            spec:
+                replicas: 1
+                selector: 
+                    matchLabels:
+                        app: second-app
+                        tier: backend
+                template: 
+                    metadata:
+                        labels:
+                            app: second-app #template name
+                            tier: backend
+                    spec:
+                        containers: 
+                            - name: second-node #container name
+                            image: samyakinnovaccer/kube-first-app:2.0
+            
+            --> metdata name is the name of the deployment
+            --> specs contains all the parameters
+        - create service.yaml file for creating service
+            apiVersion: v1
+            kind: Service
+            metadata:
+            name: backend
+            spec:
+            selector:
+                app: second-app
+            ports:
+                - protocol: 'TCP'
+                port: 80
+                targetPort: 8080
+            type: LoadBalancer
+        - run them using
+            - kubectl apply -f=deployment.yaml
+            - kubectl apply -f=service.yaml
+            - minikube service backend --url
+                - backend is the name of our service

@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>View Page</title>
+    </head>
+    <body>
+        <h3>Employee List</h3>
+        <table border="2">
+            <thead>
+                <td>ID</td>
+                <td>Name</td>
+                <td>Email</td>
+                <td>Address</td>
+            </thead>
+            <tbody>
+                {% for row in rows%}
+                <tr>
+                    <td>{{row[0]}}</td>
+                    <td>{{row[1]}}</td>
+                    <td>{{row[2]}}</td>
+                    <td>{{row[3]}}</td>
+                    <td>
+                        <a href="/delete/{{row[0]}}">delete</a>
+                    </td>
+                    <td>
+                        <a href="/edit/{{row[0]}}">edit</a>
+                    </td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+        <br/>
+        <a href="/">Go to Home page</a>
+    </body>
+</html>
