@@ -1,8 +1,7 @@
 import boto.ec2
 
 conn = boto.ec2.connect_to_region("us-east-1",
-    aws_access_key_id='AKIAR6SBPFMCNJIK4DFT',
-   aws_secret_access_key='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')
+
 
 conn = boto.ec2.connect_to_region("us-west-2")
 
